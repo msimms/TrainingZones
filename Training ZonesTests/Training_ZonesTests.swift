@@ -1,7 +1,5 @@
 //
 //  Training_ZonesTests.swift
-//  Training ZonesTests
-//
 //  Created by Michael Simms on 5/25/23.
 //
 
