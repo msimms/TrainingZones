@@ -8,8 +8,6 @@ import HealthKit
 import CoreLocation
 
 class HealthManager {
-	static let shared = HealthManager()
-	
 	private var authorized = false
 	private let healthStore = HKHealthStore();
 	public var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
@@ -18,7 +16,7 @@ class HealthManager {
 	private var hrQuery: HKQuery? = nil // the query that reads heart rate on the watch
 
 	/// Singleton constructor
-	private init() {
+	init() {
 	}
 	
 	func requestAuthorization() {
