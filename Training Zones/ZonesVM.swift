@@ -6,23 +6,23 @@
 import Foundation
 
 class ZonesVM {
-	static func hasHrData() -> Bool {
+	func hasHrData() -> Bool {
 		return true
 	}
 
-	static func hasPowerData() -> Bool {
+	func hasPowerData() -> Bool {
 		return true
 	}
 
-	static func hasRunData() -> Bool {
+	func hasRunData() -> Bool {
 		return true
 	}
 
-	static func GetRunTrainingPace(zoneNum: UInt8) -> Double {
+	func GetRunTrainingPace(zoneNum: UInt8) -> Double {
 		return 0.0
 	}
 
-	static func listHrZones() -> Array<Bar> {
+	func listHrZones() -> Array<Bar> {
 		var result: Array<Bar> = []
 		let calc: ZonesCalculator = ZonesCalculator()
 		let zones = calc.CalculateHeartRateZones(restingHr: 49.0, maxHr: 188.0, ageInYears: 49.5)
@@ -34,7 +34,7 @@ class ZonesVM {
 		return result
 	}
 	
-	static func listPowerZones() -> Array<Bar> {
+	func listPowerZones() -> Array<Bar> {
 		var result: Array<Bar> = []
 		let calc: ZonesCalculator = ZonesCalculator()
 		let zones = calc.CalcuatePowerZones(ftp: 220.0)
@@ -46,7 +46,7 @@ class ZonesVM {
 		return result
 	}
 	
-	static func listRunTrainingPaces() -> Dictionary<String, Double> {
+	func listRunTrainingPaces() -> Dictionary<String, Double> {
 		var result: Dictionary<String, Double> = [:]
 		
 		/*result[WORKOUT_INPUT_LONG_RUN_PACE] = GetRunTrainingPace(LONG_RUN_PACE)

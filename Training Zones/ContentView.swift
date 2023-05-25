@@ -6,6 +6,8 @@
 import SwiftUI
 
 struct ContentView: View {
+	var zonesVM: ZonesVM = ZonesVM()
+
 	var body: some View {
 		ScrollView() {
 			VStack(alignment: .center) {
@@ -15,8 +17,8 @@ struct ContentView: View {
 					VStack(alignment: .center) {
 						Text("Heart Rate Zones")
 							.bold()
-						if ZonesVM.hasHrData() {
-							BarChartView(bars: ZonesVM.listHrZones(), color: Color.red)
+						if self.zonesVM.hasHrData() {
+							BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red)
 								.frame(height:256)
 							Text("")
 							Text("")
@@ -36,8 +38,8 @@ struct ContentView: View {
 					VStack(alignment: .center) {
 						Text("Cycling Power Zones")
 							.bold()
-						if ZonesVM.hasPowerData() {
-							BarChartView(bars: ZonesVM.listPowerZones(), color: Color.blue)
+						if self.zonesVM.hasPowerData() {
+							BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue)
 								.frame(height:256)
 							Text("")
 							Text("")
@@ -57,8 +59,8 @@ struct ContentView: View {
 					VStack(alignment: .center) {
 						Text("Running Paces")
 							.bold()
-						if ZonesVM.hasRunData() || ZonesVM.hasHrData() {
-							let runPaces = ZonesVM.listRunTrainingPaces()
+						if self.zonesVM.hasRunData() || self.zonesVM.hasHrData() {
+							let runPaces = self.zonesVM.listRunTrainingPaces()
 							ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
 								HStack() {
 									Text(paceName)

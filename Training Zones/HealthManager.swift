@@ -13,11 +13,6 @@ class HealthManager {
 	private var authorized = false
 	private let healthStore = HKHealthStore();
 	public var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
-	public var currentHeartRate: Double = 0.0 // Most recent heart rate reading (Apple Watch)
-	public var heartRateRead: Bool = false // True if we are receiving heart rate data (Apple Watch)
-	private var locations: Dictionary<String, Array<CLLocation>> = [:] // arrays of locations stored in the health store, key is the activity ID
-	private var distances: Dictionary<String, Array<Double>> = [:] // arrays of distances computed from the locations array, key is the activity ID
-	private var speeds: Dictionary<String, Array<Double>> = [:] // arrays of speeds computed from the distances array, key is the activity ID
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
 	private var locationQueryGroup: DispatchGroup = DispatchGroup() // tracks location/route queries until they are completed
 	private var hrQuery: HKQuery? = nil // the query that reads heart rate on the watch
@@ -151,9 +146,6 @@ class HealthManager {
 	
 	func clearWorkoutsList() {
 		self.workouts.removeAll()
-		self.locations.removeAll()
-		self.distances.removeAll()
-		self.speeds.removeAll()
 	}
 	
 	func readWorkoutsFromHealthStoreOfType(activityType: HKWorkoutActivityType) {
@@ -196,37 +188,10 @@ class HealthManager {
 		self.waitForHealthKitQueries()
 	}
 
-	func calculateSpeedsFromDistances(distances: Array<Double>, activityId: String) {
-		var speeds: Array<Double> = [0]
-		
-		for (index, distance2) in distances.enumerated() {
-			if index > 0 {
-				let distance1 = distances[index - 1]
-				
-				let speed = distance2 - distance1;
-				speeds.append(speed)
-			}
-		}
-		
-		self.speeds[activityId] = speeds
-	}
-
 	private func readLocationPointsFromHealthStoreForWorkoutRoute(route: HKWorkoutRoute, activityId: String) {
 		let query = HKWorkoutRouteQuery.init(route: route) { _, routeData, done, error in
 
-			if routeData != nil {
-				if var activityLocations = self.locations[activityId] {
-					activityLocations.append(contentsOf: routeData!)
-					self.locations[activityId] = activityLocations
-				}
-				else {
-					self.locations[activityId] = Array(routeData!)
-				}
-			}
-			
 			if done {
-				if let activityLocations = self.locations[activityId] {
-				}
 				self.queryGroup.leave()
 			}
 		}
