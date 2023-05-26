@@ -14,6 +14,10 @@ let WORKOUT_INPUT_LONG_RUN_PACE: String = "Long Run Pace"
 
 class ZonesVM {
 	var healthMgr: HealthManager = HealthManager()
+	var best5KSecs: Double = 1200.0
+	var restingHr: Double = 49.0
+	var maxHr: Double = 188.0
+	var ageInYears: Double = 49.5
 
 	func hasHrData() -> Bool {
 		return true
@@ -30,7 +34,7 @@ class ZonesVM {
 	func listHrZones() -> Array<Bar> {
 		var result: Array<Bar> = []
 		let calc: ZonesCalculator = ZonesCalculator()
-		let zones = calc.CalculateHeartRateZones(restingHr: 49.0, maxHr: 188.0, ageInYears: 49.5)
+		let zones = calc.CalculateHeartRateZones(restingHr: self.restingHr, maxHr: self.maxHr, ageInYears: self.ageInYears)
 
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
@@ -55,10 +59,10 @@ class ZonesVM {
 		var result: Dictionary<String, Double> = [:]
 		let calc: ZonesCalculator = ZonesCalculator()
 
-		result[WORKOUT_INPUT_LONG_RUN_PACE] = calc.GetRunTrainingPace(zoneNum: TrainingPaceType.LONG_RUN_PACE)
-		result[WORKOUT_INPUT_EASY_RUN_PACE] = calc.GetRunTrainingPace(zoneNum: TrainingPaceType.EASY_RUN_PACE)
-		result[WORKOUT_INPUT_TEMPO_RUN_PACE] = calc.GetRunTrainingPace(zoneNum: TrainingPaceType.TEMPO_RUN_PACE)
-		result[WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE] = calc.GetRunTrainingPace(zoneNum: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE)
+		result[WORKOUT_INPUT_LONG_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, best5KSecs: self.best5KSecs, restingHr: self.restingHr, maxHr: self.maxHr, ageInYears: self.ageInYears)
+		result[WORKOUT_INPUT_EASY_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, best5KSecs: self.best5KSecs, restingHr: self.restingHr, maxHr: self.maxHr, ageInYears: self.ageInYears)
+		result[WORKOUT_INPUT_TEMPO_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, best5KSecs: self.best5KSecs, restingHr: self.restingHr, maxHr: self.maxHr, ageInYears: self.ageInYears)
+		result[WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, best5KSecs: self.best5KSecs, restingHr: self.restingHr, maxHr: self.maxHr, ageInYears: self.ageInYears)
 		return result
 	}
 }

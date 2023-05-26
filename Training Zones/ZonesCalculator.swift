@@ -25,7 +25,7 @@ class ZonesCalculator {
 	
 	func CalculateHeartRateZones(restingHr: Double, maxHr: Double, ageInYears: Double) -> [Double] {
 		var zones = Array(repeating: 0.0, count: NUM_HR_ZONES)
-		
+
 		// If given resting and max heart rates, use the Karvonen formula for determining zones based on hr reserve.
 		if restingHr > 1.0 && maxHr > 1.0 {
 			zones[0] = ((maxHr - restingHr) * 0.60) + restingHr
@@ -34,7 +34,7 @@ class ZonesCalculator {
 			zones[3] = ((maxHr - restingHr) * 0.90) + restingHr
 			zones[4] = maxHr
 		}
-		
+
 		// Maximum heart rate, but no resting heart rate.
 		else if maxHr > 1.0 {
 			zones[0] = maxHr * 0.60
@@ -43,7 +43,7 @@ class ZonesCalculator {
 			zones[3] = maxHr * 0.90
 			zones[4] = maxHr;
 		}
-		
+
 		// No heart rate information, estimate it based on age and then generate the zones.
 		else {
 			let maxHr = EstimateMaxHrFromAge(ageInYears: ageInYears)
@@ -53,10 +53,10 @@ class ZonesCalculator {
 			zones[3] = maxHr * 0.90
 			zones[4] = maxHr
 		}
-		
+
 		return zones
 	}
-	
+
 	func CalcuatePowerZones(ftp: Double) -> [Double] {
 		var zones = Array(repeating: 0.0, count: NUM_POWER_ZONES)
 		
@@ -67,8 +67,25 @@ class ZonesCalculator {
 		zones[4] = ftp * 1.20
 		return zones
 	}
-	
-	func GetRunTrainingPace(zoneNum: TrainingPaceType) -> Double {
+
+	func GetRunTrainingPace(zone: TrainingPaceType, best5KSecs: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
+		let paceCalc: TrainingPlaceCalculator = TrainingPlaceCalculator()
+		var paces: Dictionary<TrainingPaceType, Double> = [:]
+
+		// Preferred method for determining training paces: results of a recent hard effort.
+		if best5KSecs > 0 {
+			paces = paceCalc.CalcFromRaceDistanceInMeters(restingHr: restingHr, maxHr: maxHr, raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
+		}
+
+		// Second choice method: from heart rate.
+		else if restingHr > 1.0 && maxHr > 1.0 {
+			paces = paceCalc.CalcFromHR(restingHr: restingHr, maxHr: maxHr)
+		}
+
+		if let result = paces[zone] {
+			return result
+		}
+
 		return 0.0
 	}
 }
