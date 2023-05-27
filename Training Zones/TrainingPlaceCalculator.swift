@@ -48,12 +48,13 @@ class TrainingPlaceCalculator {
 
 	func CalcFromRaceDistanceInMeters(restingHr: Double, maxHr: Double, raceDurationSecs: Double, raceDistanceMeters: Double) -> Dictionary<TrainingPaceType, Double> {
 		let v02MaxCalc: VO2MaxCalculator = VO2MaxCalculator()
-		let vo2max = v02MaxCalc.EstimateVO2MaxFromHeartRate(maxHR: maxHr, restingHR: restingHr)
+		let vo2max = v02MaxCalc.EstimateVO2MaxFromRaceDistanceInMeters(raceDistanceMeters: raceDistanceMeters, raceTimeSecs: raceDurationSecs)
 		return self.CalcFromVO2Max(vo2max: vo2max)
 	}
 
 	func CalcFromHR(restingHr: Double, maxHr: Double) -> Dictionary<TrainingPaceType, Double> {
-		var paces: Dictionary<TrainingPaceType, Double> = [:]
-		return paces
+		let v02MaxCalc: VO2MaxCalculator = VO2MaxCalculator()
+		let vo2max = v02MaxCalc.EstimateVO2MaxFromHeartRate(maxHR: maxHr, restingHR: restingHr)
+		return self.CalcFromVO2Max(vo2max: vo2max)
 	}
 }

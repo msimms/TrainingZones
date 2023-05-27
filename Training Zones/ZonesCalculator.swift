@@ -68,7 +68,7 @@ class ZonesCalculator {
 		return zones
 	}
 
-	func GetRunTrainingPace(zone: TrainingPaceType, best5KSecs: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
+	func GetRunTrainingPace(zone: TrainingPaceType, vo2Max: Double, best5KSecs: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
 		let paceCalc: TrainingPlaceCalculator = TrainingPlaceCalculator()
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
 

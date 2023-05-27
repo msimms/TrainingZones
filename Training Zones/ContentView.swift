@@ -18,6 +18,28 @@ struct ContentView: View {
 						Text("Heart Rate Zones")
 							.bold()
 						if self.zonesVM.hasHrData() {
+							HStack() {
+								if self.zonesVM.healthMgr.restingHr != nil {
+									Text("Resting Heart Rate")
+										.bold()
+									Text(String(self.zonesVM.healthMgr.restingHr!))
+									Text("bpm")
+								}
+								else {
+									Text("Resting heart rate not set")
+										.bold()
+								}
+								if self.zonesVM.healthMgr.maxHr != nil {
+									Text("Maximum Heart Rate")
+										.bold()
+									Text(String(self.zonesVM.healthMgr.maxHr!))
+									Text("bpm")
+								}
+								else {
+									Text("Maximum heart rate not calculated")
+										.bold()
+								}
+							}
 							BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red)
 								.frame(height:256)
 							Text("")
@@ -26,7 +48,7 @@ struct ContentView: View {
 								.bold()
 						}
 						else {
-							Text("Heart rate zones are not available because your maximum heart rate has not been set (or estimated from existing data).")
+							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated.")
 						}
 					}
 					Spacer()
@@ -39,6 +61,12 @@ struct ContentView: View {
 						Text("Cycling Power Zones")
 							.bold()
 						if self.zonesVM.hasPowerData() {
+							HStack() {
+								Text("Functional Threshold Power")
+									.bold()
+								Text(String(self.zonesVM.functionalThresholdPower))
+								Text("watts")
+							}
 							BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue)
 								.frame(height:256)
 							Text("")
@@ -60,6 +88,14 @@ struct ContentView: View {
 						Text("Running Paces")
 							.bold()
 						if self.zonesVM.hasRunData() || self.zonesVM.hasHrData() {
+							HStack() {
+								if self.zonesVM.healthMgr.vo2Max != nil {
+									Text("VO2 Max")
+										.bold()
+									Text(String(self.zonesVM.healthMgr.vo2Max!))
+									Text("ml/kg")
+								}
+							}
 							let runPaces = self.zonesVM.listRunTrainingPaces()
 							ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
 								HStack() {

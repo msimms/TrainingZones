@@ -7,15 +7,17 @@ import Foundation
 import HealthKit
 import CoreLocation
 
-class HealthManager {
-	private var authorized = false
+class HealthManager : ObservableObject {
 	private let healthStore = HKHealthStore();
-	public var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
+	private var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
 	private var locationQueryGroup: DispatchGroup = DispatchGroup() // tracks location/route queries until they are completed
 	private var hrQuery: HKQuery? = nil // the query that reads heart rate on the watch
+	@Published var restingHr: Double?
+	@Published var maxHr: Double?
+	@Published var vo2Max: Double?
+	@Published var ageInYears: Double?
 
-	/// Singleton constructor
 	init() {
 	}
 	
@@ -27,28 +29,19 @@ class HealthManager {
 		}
 		
 		// Request authorization for things to read and write.
-#if TARGET_OS_WATCH
-		let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
-		let activeEnergyBurnType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
-		let birthdayType = HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!
-		let biologicalSexType = HKObjectType.characteristicType(forIdentifier: .biologicalSex)!
-		let writeTypes = Set([heartRateType, activeEnergyBurnType])
-		let readTypes = Set([heartRateType, heightType, weightType, birthdayType, biologicalSexType])
-#else
 		let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
 		let restingHeartRateType = HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
-		let cyclingType = HKObjectType.quantityType(forIdentifier: .distanceCycling)!
-		let runType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!
-		let swimType = HKObjectType.quantityType(forIdentifier: .distanceSwimming)!
-		let activeEnergyBurnType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
+		let vo2MaxType = HKObjectType.quantityType(forIdentifier: .vo2Max)!
 		let birthdayType = HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!
 		let biologicalSexType = HKObjectType.characteristicType(forIdentifier: .biologicalSex)!
+#if TARGET_OS_WATCH
+		let readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType])
+#else
 		let routeType = HKObjectType.seriesType(forIdentifier: HKWorkoutRouteTypeIdentifier)!
 		let workoutType = HKObjectType.workoutType()
-		let writeTypes = Set([heartRateType, restingHeartRateType, heartRateType, cyclingType, runType, swimType, activeEnergyBurnType, workoutType, routeType])
-		let readTypes = Set([heartRateType, restingHeartRateType, birthdayType, biologicalSexType, workoutType, routeType])
+		let readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType, workoutType, routeType])
 #endif
-		healthStore.requestAuthorization(toShare: writeTypes, read: readTypes) { result, error in
+		healthStore.requestAuthorization(toShare: nil, read: readTypes) { result, error in
 		}
 	}
 
@@ -130,18 +123,32 @@ class HealthManager {
 		return query
 	}
 
-	/// @brief Gets the user's resting heart rate from HealthKit and updates the copy in our database.
-	func updateUsersRestingHr() throws {
+	/// @brief Gets the user's resting heart rate from HealthKit .
+	func getRestingHr() throws {
 		let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
 		
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
 			if sample != nil {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-				let restingHr = sample!.quantity.doubleValue(for: hrUnit)
+				self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
 			}
 		}
 	}
-	
+
+	/// @brief Gets the user's VO2Max from HealthKit .
+	func getVO2Max() throws {
+		let vo2MaxType = HKObjectType.quantityType(forIdentifier: .vo2Max)!
+
+		self.mostRecentQuantitySampleOfType(quantityType: vo2MaxType) { sample, error in
+			if sample != nil {
+				let kgmin = HKUnit.gramUnit(with: .kilo).unitMultiplied(by: .minute())
+				let mL = HKUnit.literUnit(with: .milli)
+				let vo2MaxUnit = mL.unitDivided(by: kgmin)
+				self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
+			}
+		}
+	}
+
 	func clearWorkoutsList() {
 		self.workouts.removeAll()
 	}
