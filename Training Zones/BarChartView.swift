@@ -15,11 +15,13 @@ struct BarChartView: View {
 	let bars: Array<Bar>
 	let max: Double
 	let color: Color
+	let units: String
 
-	init(bars: [Bar], color: Color) {
+	init(bars: [Bar], color: Color, units: String) {
 		self.bars = bars
 		self.max = bars.map { $0.value }.max() ?? 0
 		self.color = color
+		self.units = units
 	}
 
 	var body: some View {
@@ -31,9 +33,9 @@ struct BarChartView: View {
 							.frame(height: CGFloat(bar.value) / CGFloat(self.max) * geometry.size.height)
 							.overlay(Rectangle().stroke(self.color).background(self.color))
 							.accessibility(label: Text(bar.label))
-					/*	Text(bar.label)
+						Text(bar.label + " " + self.units)
 							.rotationEffect(Angle(degrees: -90))
-							.offset(y: -50) */
+							.offset(y: -50)
 					}
 				}
 			}

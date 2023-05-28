@@ -40,7 +40,7 @@ struct ContentView: View {
 										.bold()
 								}
 							}
-							BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red)
+							BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM")
 								.frame(height:256)
 							Text("")
 							Text("")
@@ -67,7 +67,7 @@ struct ContentView: View {
 								Text(String(self.zonesVM.functionalThresholdPower))
 								Text("watts")
 							}
-							BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue)
+							BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts")
 								.frame(height:256)
 							Text("")
 							Text("")
