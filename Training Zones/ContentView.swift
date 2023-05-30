@@ -29,6 +29,8 @@ struct ContentView: View {
 									Text("Resting heart rate not set")
 										.bold()
 								}
+							}
+							HStack() {
 								if self.zonesVM.healthMgr.maxHr != nil {
 									Text("Maximum Heart Rate")
 										.bold()

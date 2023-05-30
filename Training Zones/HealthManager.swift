@@ -42,6 +42,14 @@ class HealthManager : ObservableObject {
 		let readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType, workoutType, routeType])
 #endif
 		healthStore.requestAuthorization(toShare: nil, read: readTypes) { result, error in
+			do {
+				try self.getAge()
+				try self.getRestingHr()
+				try self.getMaxHr()
+				try self.getVO2Max()
+			}
+			catch {
+			}
 		}
 	}
 
@@ -67,7 +75,30 @@ class HealthManager : ObservableObject {
 		// Execute asynchronously.
 		self.healthStore.execute(query)
 	}
-	
+
+	func recentQuantitySamplesOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantitySample?, Error?) -> ()) {
+		
+		// We are not filtering the data, and so the predicate is set to nil.
+		let query = HKSampleQuery.init(sampleType: quantityType, predicate: nil, limit: HKObjectQueryNoLimit, sortDescriptors: nil, resultsHandler: { query, results, error in
+			
+			// Error case: Call the callback handler, passing nil for the results.
+			if results == nil || results!.count == 0 {
+				callback(nil, error ?? nil)
+			}
+			
+			// Normal case: Call the callback handler with the results.
+			else {
+				for sample in results! {
+					let quantitySample = sample as! HKQuantitySample?
+					callback(quantitySample, error)
+				}
+			}
+		})
+		
+		// Execute asynchronously.
+		self.healthStore.execute(query)
+	}
+
 	func quantitySamplesOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantitySample?, Error?) -> ()) {
 		
 		// We are not filtering the data, and so the predicate is set to nil.
@@ -123,6 +154,17 @@ class HealthManager : ObservableObject {
 		return query
 	}
 
+	/// @brief Gets the user's age from HealthKit .
+	func getAge() throws {
+		let dateOfBirth = try self.healthStore.dateOfBirthComponents()
+		let gregorianCalendar = NSCalendar.init(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+		let tempDate = gregorianCalendar.date(from: dateOfBirth)
+
+		if tempDate != nil {
+			self.ageInYears = tempDate!.timeIntervalSince1970 / (365.25 * 24.0 * 60.0 * 60.0)
+		}
+	}
+
 	/// @brief Gets the user's resting heart rate from HealthKit .
 	func getRestingHr() throws {
 		let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
@@ -130,7 +172,23 @@ class HealthManager : ObservableObject {
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
 			if sample != nil {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+
 				self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
+			}
+		}
+	}
+	
+	func getMaxHr() throws {
+		let hrType = HKObjectType.quantityType(forIdentifier: .heartRate)!
+		
+		self.recentQuantitySamplesOfType(quantityType: hrType) { sample, error in
+			if sample != nil {
+				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+				let hrValue = sample!.quantity.doubleValue(for: hrUnit)
+
+				if self.maxHr == nil || hrValue > self.maxHr! {
+					self.maxHr = hrValue
+				}
 			}
 		}
 	}
@@ -144,6 +202,7 @@ class HealthManager : ObservableObject {
 				let kgmin = HKUnit.gramUnit(with: .kilo).unitMultiplied(by: .minute())
 				let mL = HKUnit.literUnit(with: .milli)
 				let vo2MaxUnit = mL.unitDivided(by: kgmin)
+
 				self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
 			}
 		}

@@ -16,8 +16,6 @@ class ZonesVM {
 	var healthMgr: HealthManager = HealthManager()
 	var best5KSecs: Double = 1200.0
 	var functionalThresholdPower: Double = 212.0
-	var maxHr: Double = 188.0
-	var ageInYears: Double = 49.5
 
 	init() {
 		self.healthMgr.requestAuthorization()
@@ -38,12 +36,12 @@ class ZonesVM {
 	func listHrZones() -> Array<Bar> {
 		var result: Array<Bar> = []
 
-		guard (self.healthMgr.restingHr != nil) else {
+		guard (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil && self.healthMgr.ageInYears != nil) else {
 			return result
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
-		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr!, maxHr: self.maxHr, ageInYears: self.ageInYears)
+		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr!, maxHr: self.healthMgr.maxHr!, ageInYears: self.healthMgr.ageInYears!)
 
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
@@ -67,11 +65,15 @@ class ZonesVM {
 	func listRunTrainingPaces() -> Dictionary<String, Double> {
 		var result: Dictionary<String, Double> = [:]
 		let calc: ZonesCalculator = ZonesCalculator()
+		let restingHr = self.healthMgr.restingHr ?? 0.0
+		let maxHr = self.healthMgr.maxHr ?? 0.0
+		let vo2Max = self.healthMgr.vo2Max ?? 0.0
+		let ageInYears = self.healthMgr.ageInYears ?? 0.0
 
-		result[WORKOUT_INPUT_LONG_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: self.healthMgr.vo2Max ?? 0.0, best5KSecs: self.best5KSecs, restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.maxHr, ageInYears: self.ageInYears)
-		result[WORKOUT_INPUT_EASY_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: self.healthMgr.vo2Max ?? 0.0, best5KSecs: self.best5KSecs, restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.maxHr, ageInYears: self.ageInYears)
-		result[WORKOUT_INPUT_TEMPO_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: self.healthMgr.vo2Max ?? 0.0, best5KSecs: self.best5KSecs, restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.maxHr, ageInYears: self.ageInYears)
-		result[WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: self.healthMgr.vo2Max ?? 0.0, best5KSecs: self.best5KSecs, restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.maxHr, ageInYears: self.ageInYears)
+		result[WORKOUT_INPUT_LONG_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: self.best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+		result[WORKOUT_INPUT_EASY_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: self.best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+		result[WORKOUT_INPUT_TEMPO_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: self.best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+		result[WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: self.best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
 		return result
 	}
 }
