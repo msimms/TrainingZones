@@ -6,12 +6,52 @@
 import SwiftUI
 
 struct ContentView: View {
-	var zonesVM: ZonesVM = ZonesVM()
+	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
+	@State private var showingUnitsSelection: Bool = false
+	@State private var units: String = "Metric"
+
+	/// @brief Utility function for converting a number of seconds into HH:MMSS format
+	func formatAsHHMMSS(numSeconds: Double) -> String {
+		let SECS_PER_DAY  = 86400
+		let SECS_PER_HOUR = 3600
+		let SECS_PER_MIN  = 60
+		var tempSeconds   = Int(numSeconds)
+		
+		let days     = (tempSeconds / SECS_PER_DAY)
+		tempSeconds -= (days * SECS_PER_DAY)
+		let hours    = (tempSeconds / SECS_PER_HOUR)
+		tempSeconds -= (hours * SECS_PER_HOUR)
+		let minutes  = (tempSeconds / SECS_PER_MIN)
+		tempSeconds -= (minutes * SECS_PER_MIN)
+		let seconds  = (tempSeconds % SECS_PER_MIN)
+		
+		if days > 0 {
+			return String(format: "%02d:%02d:%02d:%02d", days, hours, minutes, seconds)
+		}
+		else if hours > 0 {
+			return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+		}
+		return String(format: "%02d:%02d", minutes, seconds)
+	}
+
+	func convertPaceToDisplayString(paceMetersMin: Double) -> String {
+		if self.units == "Metric" {
+			let paceKmMin = (1000.0 / paceMetersMin) * 60.0
+			return self.formatAsHHMMSS(numSeconds: paceKmMin)
+		}
+		else if self.units == "Imperial" {
+			let METERS_PER_MILE = 1609.34
+			let paceKmMin = (METERS_PER_MILE / paceMetersMin) * 60.0
+			return self.formatAsHHMMSS(numSeconds: paceKmMin)
+		}
+		return String(paceMetersMin)
+	}
 
 	var body: some View {
 		ScrollView() {
 			VStack(alignment: .center) {
-				
+
+				// Heart Rate Zones
 				HStack() {
 					Spacer()
 					VStack(alignment: .center) {
@@ -57,6 +97,7 @@ struct ContentView: View {
 				}
 				.padding(10)
 				
+				// Cycling Power Zones
 				HStack() {
 					Spacer()
 					VStack(alignment: .center) {
@@ -84,18 +125,39 @@ struct ContentView: View {
 				}
 				.padding(10)
 				
+				// Running Paces
 				HStack() {
 					Spacer()
+
 					VStack(alignment: .center) {
 						Text("Running Paces")
 							.bold()
+						
+						// Unit selection
+						HStack {
+							Spacer()
+							Button("Units: " + self.units) {
+								self.showingUnitsSelection = true
+							}
+							.confirmationDialog("Preferred unit system", isPresented: self.$showingUnitsSelection, titleVisibility: .visible) {
+								ForEach(["Metric", "Imperial"], id: \.self) { item in
+									Button(item) {
+										self.units = item
+									}
+								}
+							}
+							.bold()
+							Spacer()
+						}
+						.padding(5)
+
 						if self.zonesVM.hasRunData() || self.zonesVM.hasHrData() {
 							HStack() {
 								if self.zonesVM.healthMgr.vo2Max != nil {
 									Text("VO2 Max")
 										.bold()
 									Text(String(self.zonesVM.healthMgr.vo2Max!))
-									Text("ml/kg")
+									Text("ml/kg/min")
 								}
 							}
 							let runPaces = self.zonesVM.listRunTrainingPaces()
@@ -104,9 +166,9 @@ struct ContentView: View {
 									Text(paceName)
 										.bold()
 									Spacer()
-									Text(String(runPaces[paceName]!))
+									Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
 								}
-								.padding(5)
+								.padding(10)
 							}
 						}
 						else {
@@ -119,7 +181,6 @@ struct ContentView: View {
 			}
 		}
 	}
-
 }
 
 struct ContentView_Previews: PreviewProvider {

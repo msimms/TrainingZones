@@ -72,12 +72,17 @@ class ZonesCalculator {
 		let paceCalc: TrainingPlaceCalculator = TrainingPlaceCalculator()
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
 
-		// Preferred method for determining training paces: results of a recent hard effort.
-		if best5KSecs > 0 {
+		// Preferred method: VO2Max
+		if vo2Max > 0.0 {
+			paces = paceCalc.CalcFromVO2Max(vo2max: vo2Max)
+		}
+		
+		// Second choice method: results of a recent hard effort.
+		else if best5KSecs > 0.0 {
 			paces = paceCalc.CalcFromRaceDistanceInMeters(restingHr: restingHr, maxHr: maxHr, raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
 		}
 
-		// Second choice method: from heart rate.
+		// Third choice method: from heart rate.
 		else if restingHr > 1.0 && maxHr > 1.0 {
 			paces = paceCalc.CalcFromHR(restingHr: restingHr, maxHr: maxHr)
 		}

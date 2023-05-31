@@ -29,13 +29,16 @@ struct BarChartView: View {
 			HStack(alignment: .bottom) {
 				ForEach(self.bars) { bar in
 					VStack(alignment: .center) {
-						Rectangle()
-							.frame(height: CGFloat(bar.value) / CGFloat(self.max) * geometry.size.height)
-							.overlay(Rectangle().stroke(self.color).background(self.color))
-							.accessibility(label: Text(bar.label))
-						Text(bar.label + " " + self.units)
-							.rotationEffect(Angle(degrees: -90))
-							.offset(y: -50)
+						ZStack() {
+							let barHeight = CGFloat(bar.value) / CGFloat(self.max) * geometry.size.height
+							Rectangle()
+								.frame(height: barHeight)
+								.overlay(Rectangle().stroke(self.color).background(self.color))
+								.accessibility(label: Text(bar.label))
+							Text(bar.label + " " + self.units)
+								.rotationEffect(Angle(degrees: -90))
+								.offset(y: 0)
+						}
 					}
 				}
 			}

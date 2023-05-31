@@ -7,8 +7,8 @@ import Foundation
 
 class TrainingPlaceCalculator {
 
-	func ConvertToSpeed(vo2: Double) -> Double {
-		return 29.54 + 5.000663 * vo2 - 0.007546 * vo2 * vo2;
+	func ConvertToSpeed(vo2max: Double) -> Double {
+		return 29.54 + 5.000663 * vo2max - 0.007546 * vo2max * vo2max;
 	}
 	
 	// Give the athlete's VO2Max, returns the suggested long run, easy run, tempo run, and speed run paces.
@@ -29,12 +29,12 @@ class TrainingPlaceCalculator {
 		var speedPace: Double = vo2max * 1.1
 		var shortIntervalPace: Double = vo2max * 1.15
 	
-		longRunPace = self.ConvertToSpeed(vo2: longRunPace)
-		easyPace = self.ConvertToSpeed(vo2: easyPace)
-		tempoPace = self.ConvertToSpeed(vo2: tempoPace)
-		functionalThresholdPace = self.ConvertToSpeed(vo2: functionalThresholdPace)
-		speedPace = self.ConvertToSpeed(vo2: speedPace)
-		shortIntervalPace = self.ConvertToSpeed(vo2: shortIntervalPace)
+		longRunPace = self.ConvertToSpeed(vo2max: longRunPace)
+		easyPace = self.ConvertToSpeed(vo2max: easyPace)
+		tempoPace = self.ConvertToSpeed(vo2max: tempoPace)
+		functionalThresholdPace = self.ConvertToSpeed(vo2max: functionalThresholdPace)
+		speedPace = self.ConvertToSpeed(vo2max: speedPace)
+		shortIntervalPace = self.ConvertToSpeed(vo2max: shortIntervalPace)
 	
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
 		paces[TrainingPaceType.LONG_RUN_PACE] = longRunPace

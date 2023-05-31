@@ -12,7 +12,7 @@ let WORKOUT_INPUT_TEMPO_RUN_PACE: String = "Tempo Run Pace"
 let WORKOUT_INPUT_EASY_RUN_PACE: String = "Easy Run Pace"
 let WORKOUT_INPUT_LONG_RUN_PACE: String = "Long Run Pace"
 
-class ZonesVM {
+class ZonesVM : ObservableObject {
 	var healthMgr: HealthManager = HealthManager()
 	var best5KSecs: Double = 1200.0
 	var functionalThresholdPower: Double = 212.0
