@@ -180,6 +180,7 @@ class HealthManager : ObservableObject {
 		}
 	}
 	
+	/// @brief Estimates the user's maximum heart rate from the last six months of HealthKit data.
 	func getMaxHr() throws {
 		let hrType = HKObjectType.quantityType(forIdentifier: .heartRate)!
 		

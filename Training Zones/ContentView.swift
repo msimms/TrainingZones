@@ -7,7 +7,9 @@ import SwiftUI
 
 struct ContentView: View {
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
+	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
 	@State private var showingUnitsSelection: Bool = false
+	@State private var showingFtpError: Bool = false
 	@State private var units: String = "Metric"
 
 	/// @brief Utility function for converting a number of seconds into HH:MMSS format
@@ -57,31 +59,38 @@ struct ContentView: View {
 					VStack(alignment: .center) {
 						Text("Heart Rate Zones")
 							.bold()
+							.padding(5)
+
+						if !self.zonesVM.hasHrData() {
+							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated.")
+						}
+						HStack() {
+							if self.zonesVM.healthMgr.restingHr != nil {
+								Text("Resting Heart Rate")
+									.bold()
+								Text(String(self.zonesVM.healthMgr.restingHr!))
+								Text("bpm")
+							}
+							else {
+								Text("Resting Heart Rate: Not Set")
+									.bold()
+								Spacer()
+							}
+						}
+						HStack() {
+							if self.zonesVM.healthMgr.maxHr != nil {
+								Text("Maximum Heart Rate")
+									.bold()
+								Text(String(self.zonesVM.healthMgr.maxHr!))
+								Text("bpm")
+							}
+							else {
+								Text("Maximum Heart Rate: Not Set")
+									.bold()
+								Spacer()
+							}
+						}
 						if self.zonesVM.hasHrData() {
-							HStack() {
-								if self.zonesVM.healthMgr.restingHr != nil {
-									Text("Resting Heart Rate")
-										.bold()
-									Text(String(self.zonesVM.healthMgr.restingHr!))
-									Text("bpm")
-								}
-								else {
-									Text("Resting heart rate not set")
-										.bold()
-								}
-							}
-							HStack() {
-								if self.zonesVM.healthMgr.maxHr != nil {
-									Text("Maximum Heart Rate")
-										.bold()
-									Text(String(self.zonesVM.healthMgr.maxHr!))
-									Text("bpm")
-								}
-								else {
-									Text("Maximum heart rate not calculated")
-										.bold()
-								}
-							}
 							BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM")
 								.frame(height:256)
 							Text("")
@@ -89,11 +98,7 @@ struct ContentView: View {
 							Text("BPM")
 								.bold()
 						}
-						else {
-							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated.")
-						}
 					}
-					Spacer()
 				}
 				.padding(10)
 				
@@ -103,22 +108,35 @@ struct ContentView: View {
 					VStack(alignment: .center) {
 						Text("Cycling Power Zones")
 							.bold()
+							.padding(5)
+
+						if !self.zonesVM.hasPowerData() {
+							Text("Cycling power zones are not available because your FTP has not been set.")
+						}
+						HStack() {
+							Text("Functional Threshold Power: ")
+								.bold()
+							Spacer()
+							TextField("Watts", text: self.$ftp.value)
+								.keyboardType(.decimalPad)
+								.multilineTextAlignment(.trailing)
+								.fixedSize()
+								.onChange(of: self.ftp.value) { value in
+									if let value = Double(self.ftp.value) {
+										self.zonesVM.functionalThresholdPower = value
+									} else {
+										self.showingFtpError = true
+									}
+								}
+							Text("watts")
+						}
 						if self.zonesVM.hasPowerData() {
-							HStack() {
-								Text("Functional Threshold Power")
-									.bold()
-								Text(String(self.zonesVM.functionalThresholdPower))
-								Text("watts")
-							}
 							BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts")
 								.frame(height:256)
 							Text("")
 							Text("")
 							Text("Watts")
 								.bold()
-						}
-						else {
-							Text("Cycling power zones are not available because your FTP has not been set (or estimated from cycling power data).")
 						}
 					}
 					Spacer()
@@ -128,28 +146,10 @@ struct ContentView: View {
 				// Running Paces
 				HStack() {
 					Spacer()
-
 					VStack(alignment: .center) {
 						Text("Running Paces")
 							.bold()
-						
-						// Unit selection
-						HStack {
-							Spacer()
-							Button("Units: " + self.units) {
-								self.showingUnitsSelection = true
-							}
-							.confirmationDialog("Preferred unit system", isPresented: self.$showingUnitsSelection, titleVisibility: .visible) {
-								ForEach(["Metric", "Imperial"], id: \.self) { item in
-									Button(item) {
-										self.units = item
-									}
-								}
-							}
-							.bold()
-							Spacer()
-						}
-						.padding(5)
+							.padding(5)
 
 						if self.zonesVM.hasRunData() || self.zonesVM.hasHrData() {
 							HStack() {
@@ -168,14 +168,31 @@ struct ContentView: View {
 									Spacer()
 									Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
 								}
-								.padding(10)
+								.padding(5)
 							}
+
+							// Unit selection
+							HStack {
+								Spacer()
+								Button("Units: " + self.units) {
+									self.showingUnitsSelection = true
+								}
+								.confirmationDialog(self.units, isPresented: self.$showingUnitsSelection, titleVisibility: .visible) {
+									ForEach(["Metric", "Imperial"], id: \.self) { item in
+										Button(item) {
+											self.units = item
+										}
+									}
+								}
+								.bold()
+								Spacer()
+							}
+							.padding(5)
 						}
 						else {
-							Text("Run paces are not available because there are no runs of at least 5 km in the database.")
+							Text("To calculate run paces VO2Max (Cardio Fitness Score) must be present, or a run workout of at least 5 KM must be recorded, along with heart rate data.")
 						}
 					}
-					Spacer()
 				}
 				.padding(10)
 			}
