@@ -52,7 +52,7 @@ struct ContentView: View {
 	var body: some View {
 		ScrollView() {
 			VStack(alignment: .center) {
-
+				
 				// Heart Rate Zones
 				HStack() {
 					Spacer()
@@ -60,34 +60,33 @@ struct ContentView: View {
 						Text("Heart Rate Zones")
 							.bold()
 							.padding(5)
-
+						
 						if !self.zonesVM.hasHrData() {
 							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated.")
+							Spacer()
 						}
 						HStack() {
+							Text("Resting Heart Rate")
+								.bold()
+							Spacer()
 							if self.zonesVM.healthMgr.restingHr != nil {
-								Text("Resting Heart Rate")
-									.bold()
 								Text(String(self.zonesVM.healthMgr.restingHr!))
 								Text("bpm")
 							}
 							else {
-								Text("Resting Heart Rate: Not Set")
-									.bold()
-								Spacer()
+								Text("Not Set")
 							}
 						}
 						HStack() {
+							Text("Maximum Heart Rate")
+								.bold()
+							Spacer()
 							if self.zonesVM.healthMgr.maxHr != nil {
-								Text("Maximum Heart Rate")
-									.bold()
 								Text(String(self.zonesVM.healthMgr.maxHr!))
 								Text("bpm")
 							}
 							else {
-								Text("Maximum Heart Rate: Not Set")
-									.bold()
-								Spacer()
+								Text("Not Set")
 							}
 						}
 						if self.zonesVM.hasHrData() {
@@ -109,9 +108,10 @@ struct ContentView: View {
 						Text("Cycling Power Zones")
 							.bold()
 							.padding(5)
-
+						
 						if !self.zonesVM.hasPowerData() {
 							Text("Cycling power zones are not available because your FTP has not been set.")
+							Spacer()
 						}
 						HStack() {
 							Text("Functional Threshold Power: ")
@@ -139,7 +139,6 @@ struct ContentView: View {
 								.bold()
 						}
 					}
-					Spacer()
 				}
 				.padding(10)
 				
@@ -150,16 +149,22 @@ struct ContentView: View {
 						Text("Running Paces")
 							.bold()
 							.padding(5)
-
-						if self.zonesVM.hasRunData() || self.zonesVM.hasHrData() {
+						
+						if !(self.zonesVM.hasRunData() || self.zonesVM.hasHrData()) {
+							Text("To calculate run paces VO2Max (Cardio Fitness Score) must be present, or a run workout of at least 5 KM must be recorded, along with heart rate data.")
+							Spacer()
+						}
+						else {
 							HStack() {
 								if self.zonesVM.healthMgr.vo2Max != nil {
 									Text("VO2 Max")
 										.bold()
+									Spacer()
 									Text(String(self.zonesVM.healthMgr.vo2Max!))
 									Text("ml/kg/min")
 								}
 							}
+							.padding(5)
 							let runPaces = self.zonesVM.listRunTrainingPaces()
 							ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
 								HStack() {
@@ -170,7 +175,7 @@ struct ContentView: View {
 								}
 								.padding(5)
 							}
-
+							
 							// Unit selection
 							HStack {
 								Spacer()
@@ -189,13 +194,10 @@ struct ContentView: View {
 							}
 							.padding(5)
 						}
-						else {
-							Text("To calculate run paces VO2Max (Cardio Fitness Score) must be present, or a run workout of at least 5 KM must be recorded, along with heart rate data.")
-						}
 					}
 				}
 				.padding(10)
-			}
+ 			}
 		}
 	}
 }

@@ -22,7 +22,7 @@ class ZonesVM : ObservableObject {
 	}
 
 	func hasHrData() -> Bool {
-		return self.healthMgr.restingHr != nil
+		return self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil
 	}
 
 	func hasPowerData() -> Bool {
