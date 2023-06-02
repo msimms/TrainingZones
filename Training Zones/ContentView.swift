@@ -8,8 +8,12 @@ import SwiftUI
 struct ContentView: View {
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
+	@ObservedObject var vo2Max = NumbersOnly(initialDoubleValue: 0.0)
+	@ObservedObject var best5KSecs = NumbersOnly(initialValue: 0)
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
+	@State private var showingVO2MaxError: Bool = false
+	@State private var showingBest5KSecsError: Bool = false
 	@State private var units: String = "Metric"
 
 	/// @brief Utility function for converting a number of seconds into HH:MMSS format
@@ -37,14 +41,16 @@ struct ContentView: View {
 	}
 
 	func convertPaceToDisplayString(paceMetersMin: Double) -> String {
-		if self.units == "Metric" {
-			let paceKmMin = (1000.0 / paceMetersMin) * 60.0
-			return self.formatAsHHMMSS(numSeconds: paceKmMin)
-		}
-		else if self.units == "Imperial" {
-			let METERS_PER_MILE = 1609.34
-			let paceKmMin = (METERS_PER_MILE / paceMetersMin) * 60.0
-			return self.formatAsHHMMSS(numSeconds: paceKmMin)
+		if paceMetersMin > 0.0 {
+			if self.units == "Metric" {
+				let paceKmMin = (1000.0 / paceMetersMin) * 60.0
+				return self.formatAsHHMMSS(numSeconds: paceKmMin)
+			}
+			else if self.units == "Imperial" {
+				let METERS_PER_MILE = 1609.34
+				let paceKmMin = (METERS_PER_MILE / paceMetersMin) * 60.0
+				return self.formatAsHHMMSS(numSeconds: paceKmMin)
+			}
 		}
 		return String(paceMetersMin)
 	}
@@ -62,11 +68,23 @@ struct ContentView: View {
 							.padding(5)
 						
 						if !self.zonesVM.hasHrData() {
-							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated.")
+							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated and age has not been set.")
 							Spacer()
 						}
 						HStack() {
-							Text("Resting Heart Rate")
+							Text("Age (Years):")
+								.bold()
+							Spacer()
+							if self.zonesVM.healthMgr.ageInYears != nil {
+								Text(String(self.zonesVM.healthMgr.ageInYears!))
+								Text("years")
+							}
+							else {
+								Text("Not Set")
+							}
+						}
+						HStack() {
+							Text("Resting Heart Rate:")
 								.bold()
 							Spacer()
 							if self.zonesVM.healthMgr.restingHr != nil {
@@ -78,7 +96,7 @@ struct ContentView: View {
 							}
 						}
 						HStack() {
-							Text("Maximum Heart Rate")
+							Text("Maximum Heart Rate:")
 								.bold()
 							Spacer()
 							if self.zonesVM.healthMgr.maxHr != nil {
@@ -151,48 +169,72 @@ struct ContentView: View {
 							.padding(5)
 						
 						if !(self.zonesVM.hasRunData() || self.zonesVM.hasHrData()) {
-							Text("To calculate run paces VO2Max (Cardio Fitness Score) must be present, or a run workout of at least 5 KM must be recorded, along with heart rate data.")
+							Text("To calculate run paces VO2Max (Cardio Fitness Score) must be calculated, or a hard run of at least 5 KM must be known.")
 							Spacer()
 						}
-						else {
-							HStack() {
-								if self.zonesVM.healthMgr.vo2Max != nil {
-									Text("VO2 Max")
-										.bold()
-									Spacer()
-									Text(String(self.zonesVM.healthMgr.vo2Max!))
-									Text("ml/kg/min")
-								}
-							}
-							.padding(5)
-							let runPaces = self.zonesVM.listRunTrainingPaces()
-							ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
-								HStack() {
-									Text(paceName)
-										.bold()
-									Spacer()
-									Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
-								}
-								.padding(5)
-							}
-							
-							// Unit selection
-							HStack {
-								Spacer()
-								Button("Units: " + self.units) {
-									self.showingUnitsSelection = true
-								}
-								.confirmationDialog(self.units, isPresented: self.$showingUnitsSelection, titleVisibility: .visible) {
-									ForEach(["Metric", "Imperial"], id: \.self) { item in
-										Button(item) {
-											self.units = item
-										}
+
+						HStack() {
+							Text("VO2 Max:")
+								.bold()
+							Spacer()
+							TextField("ml/kg/min", text: self.$vo2Max.value)
+								.keyboardType(.decimalPad)
+								.multilineTextAlignment(.trailing)
+								.fixedSize()
+								.onChange(of: self.vo2Max.value) { value in
+									if let value = Double(self.vo2Max.value) {
+										self.zonesVM.healthMgr.vo2Max = value
+									} else {
+										self.showingVO2MaxError = true
 									}
 								}
+								Text("ml/kg/min")
+						}
+						
+						HStack() {
+							Text("Best Recent 5 KM Effort:")
 								.bold()
+							Spacer()
+							TextField("seconds", text: self.$best5KSecs.value)
+								.keyboardType(.decimalPad)
+								.multilineTextAlignment(.trailing)
+								.fixedSize()
+								.onChange(of: self.best5KSecs.value) { value in
+									if let value = Double(self.best5KSecs.value) {
+										self.zonesVM.best5KSecs = value
+									} else {
+										self.showingBest5KSecsError = true
+									}
+								}
+							Text("seconds")
+						}
+
+						let runPaces = self.zonesVM.listRunTrainingPaces()
+						ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
+							HStack() {
+								Text(paceName)
+									.bold()
 								Spacer()
+								Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
 							}
 							.padding(5)
+						}
+
+						// Unit selection
+						HStack {
+							Spacer()
+							Button("Units: " + self.units) {
+								self.showingUnitsSelection = true
+							}
+							.confirmationDialog(self.units, isPresented: self.$showingUnitsSelection, titleVisibility: .visible) {
+								ForEach(["Metric", "Imperial"], id: \.self) { item in
+									Button(item) {
+										self.units = item
+									}
+								}
+							}
+							.bold()
+							Spacer()
 						}
 					}
 				}

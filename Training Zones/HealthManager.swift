@@ -44,11 +44,22 @@ class HealthManager : ObservableObject {
 		healthStore.requestAuthorization(toShare: nil, read: readTypes) { result, error in
 			do {
 				try self.getAge()
+			}
+			catch {
+				NSLog("Failed to read the age from HealthKit.")
+			}
+			do {
 				try self.getRestingHr()
 				try self.getMaxHr()
+			}
+			catch {
+				NSLog("Failed to read heart rate information from HealthKit.")
+			}
+			do {
 				try self.getVO2Max()
 			}
 			catch {
+				NSLog("Failed to read the VO2Max from HealthKit.")
 			}
 		}
 	}

@@ -5,15 +5,25 @@
 
 import Foundation
 
+enum TrainingPaceType {
+	case LONG_RUN_PACE
+	case EASY_RUN_PACE
+	case MARATHON_PACE
+	case TEMPO_RUN_PACE
+	case FUNCTIONAL_THRESHOLD_PACE
+	case SPEED_RUN_PACE
+	case SHORT_INTERVAL_RUN_PACE
+};
+
 class TrainingPlaceCalculator {
 
 	func ConvertToSpeed(vo2max: Double) -> Double {
 		return 29.54 + 5.000663 * vo2max - 0.007546 * vo2max * vo2max;
 	}
-	
+
 	// Give the athlete's VO2Max, returns the suggested long run, easy run, tempo run, and speed run paces.
 	func CalcFromVO2Max(vo2max: Double) -> Dictionary<TrainingPaceType, Double> {
-		// Percentage of VO2 Max; from the USATF Coaches Education Program’s
+		// Percentage of VO2 Max; from the USATF Coaches Education Program
 		// 800 meters 120-136%
 		// 1500 meters 110-112%
 		// 3000 meter 100-102%
@@ -24,6 +34,7 @@ class TrainingPlaceCalculator {
 	
 		var longRunPace: Double = vo2max * 0.6
 		var easyPace: Double = vo2max * 0.7
+		var marathonPace: Double = vo2max * 0.82
 		var tempoPace: Double = vo2max * 0.88
 		var functionalThresholdPace: Double = vo2max
 		var speedPace: Double = vo2max * 1.1
@@ -31,6 +42,7 @@ class TrainingPlaceCalculator {
 	
 		longRunPace = self.ConvertToSpeed(vo2max: longRunPace)
 		easyPace = self.ConvertToSpeed(vo2max: easyPace)
+		marathonPace = self.ConvertToSpeed(vo2max: marathonPace)
 		tempoPace = self.ConvertToSpeed(vo2max: tempoPace)
 		functionalThresholdPace = self.ConvertToSpeed(vo2max: functionalThresholdPace)
 		speedPace = self.ConvertToSpeed(vo2max: speedPace)
@@ -39,6 +51,7 @@ class TrainingPlaceCalculator {
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
 		paces[TrainingPaceType.LONG_RUN_PACE] = longRunPace
 		paces[TrainingPaceType.EASY_RUN_PACE] = easyPace
+		paces[TrainingPaceType.MARATHON_PACE] = marathonPace
 		paces[TrainingPaceType.TEMPO_RUN_PACE] = tempoPace
 		paces[TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE] = functionalThresholdPace
 		paces[TrainingPaceType.SPEED_RUN_PACE] = speedPace

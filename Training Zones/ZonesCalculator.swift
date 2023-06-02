@@ -8,15 +8,6 @@ import Foundation
 let NUM_HR_ZONES = 5
 let NUM_POWER_ZONES = 5
 
-enum TrainingPaceType {
-	case LONG_RUN_PACE
-	case EASY_RUN_PACE
-	case TEMPO_RUN_PACE
-	case FUNCTIONAL_THRESHOLD_PACE
-	case SPEED_RUN_PACE
-	case SHORT_INTERVAL_RUN_PACE
-};
-
 class ZonesCalculator {
 	func EstimateMaxHrFromAge(ageInYears: Double) -> Double {
 		// Use the Oakland nonlinear formula to estimate based on age.
