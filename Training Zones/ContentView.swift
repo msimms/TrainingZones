@@ -76,7 +76,7 @@ struct ContentView: View {
 								.bold()
 							Spacer()
 							if self.zonesVM.healthMgr.ageInYears != nil {
-								Text(String(self.zonesVM.healthMgr.ageInYears!))
+								Text(String(format: "%.2f", self.zonesVM.healthMgr.ageInYears!))
 								Text("years")
 							}
 							else {

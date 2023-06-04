@@ -174,7 +174,8 @@ class HealthManager : ObservableObject {
 		let tempDate = gregorianCalendar.date(from: dateOfBirth)
 
 		if tempDate != nil {
-			self.ageInYears = tempDate!.timeIntervalSince1970 / (365.25 * 24.0 * 60.0 * 60.0)
+			let SECS_PER_YEAR = 365.25 * 24.0 * 60.0 * 60.0
+			self.ageInYears = (Date.now.timeIntervalSince1970 - tempDate!.timeIntervalSince1970) / SECS_PER_YEAR
 		}
 	}
 
