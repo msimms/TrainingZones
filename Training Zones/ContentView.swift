@@ -44,12 +44,12 @@ struct ContentView: View {
 		if paceMetersMin > 0.0 {
 			if self.units == "Metric" {
 				let paceKmMin = (1000.0 / paceMetersMin) * 60.0
-				return self.formatAsHHMMSS(numSeconds: paceKmMin)
+				return self.formatAsHHMMSS(numSeconds: paceKmMin) + " min/km"
 			}
 			else if self.units == "Imperial" {
 				let METERS_PER_MILE = 1609.34
 				let paceKmMin = (METERS_PER_MILE / paceMetersMin) * 60.0
-				return self.formatAsHHMMSS(numSeconds: paceKmMin)
+				return self.formatAsHHMMSS(numSeconds: paceKmMin) + " min/mile"
 			}
 		}
 		return String(paceMetersMin)
