@@ -5,13 +5,13 @@
 
 import Foundation
 
-let WORKOUT_INPUT_SPEED_RUN_PACE: String = "Speed Session Pace" // Pace for medium distance interfals
-let WORKOUT_INPUT_SHORT_INTERVAL_RUN_PACE: String = "Short Interval Run Pace" // Pace for shorter track intervals
-let WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE: String = "Functional Threshold Pace" // Pace that could be held for one hour, max effort
-let WORKOUT_INPUT_TEMPO_RUN_PACE: String = "Tempo Run Pace"
-let WORKOUT_INPUT_MARATHON_PACE: String = "Marathon Pace"
-let WORKOUT_INPUT_EASY_RUN_PACE: String = "Easy Run Pace"
-let WORKOUT_INPUT_LONG_RUN_PACE: String = "Long Run Pace"
+let SPEED_RUN_PACE_STR: String = "Speed Session Pace" // Pace for medium distance interfals
+let SHORT_INTERVAL_RUN_PACE_STR: String = "Short Interval Run Pace" // Pace for shorter track intervals
+let FUNCTIONAL_THRESHOLD_PACE_STR: String = "Functional Threshold Pace" // Pace that could be held for one hour, max effort
+let TEMPO_RUN_PACE_STR: String = "Tempo Run Pace"
+let MARATHON_PACE_STR: String = "Marathon Pace"
+let EASY_RUN_PACE_STR: String = "Easy Run Pace"
+let LONG_RUN_PACE_STR: String = "Long Run Pace"
 
 class ZonesVM : ObservableObject {
 	@Published var healthMgr: HealthManager = HealthManager.shared
@@ -43,10 +43,11 @@ class ZonesVM : ObservableObject {
 
 		let calc: ZonesCalculator = ZonesCalculator()
 		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr!, maxHr: self.healthMgr.maxHr!, ageInYears: self.healthMgr.ageInYears!)
+		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
 
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
-			result.append(Bar(value: zoneValue, label: String(Int(zoneValue))))
+			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 		}
 		return result
 	}
@@ -60,10 +61,11 @@ class ZonesVM : ObservableObject {
 
 		let calc: ZonesCalculator = ZonesCalculator()
 		let zones = calc.CalcuatePowerZones(ftp: self.functionalThresholdPower!)
+		let descriptions = ["Recovery", "Endurance", "Tempo", "Lactate Threshold", "VO2 Max", "Anaerobic Capacity", "Neuromuscular Power"]
 
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
-			result.append(Bar(value: zoneValue, label: String(Int(zoneValue))))
+			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 		}
 		return result
 	}
@@ -79,11 +81,11 @@ class ZonesVM : ObservableObject {
 			let best5KSecs = self.best5KSecs ?? 0.0
 			let ageInYears = self.healthMgr.ageInYears ?? 0.0
 			
-			result[WORKOUT_INPUT_LONG_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[WORKOUT_INPUT_EASY_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[WORKOUT_INPUT_MARATHON_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[WORKOUT_INPUT_TEMPO_RUN_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[WORKOUT_INPUT_FUNCTIONAL_THRESHOLD_PACE] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[EASY_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[MARATHON_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[TEMPO_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[FUNCTIONAL_THRESHOLD_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
 		}
 		return result
 	}

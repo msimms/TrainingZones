@@ -6,7 +6,7 @@
 import Foundation
 
 let NUM_HR_ZONES = 5
-let NUM_POWER_ZONES = 5
+let NUM_POWER_ZONES = 6
 
 class ZonesCalculator {
 	func EstimateMaxHrFromAge(ageInYears: Double) -> Double {
@@ -51,11 +51,13 @@ class ZonesCalculator {
 	func CalcuatePowerZones(ftp: Double) -> [Double] {
 		var zones = Array(repeating: 0.0, count: NUM_POWER_ZONES)
 		
+		// Dr. Andy Coggan 6 zone model, last zone is anything over
 		zones[0] = ftp * 0.55
 		zones[1] = ftp * 0.75
 		zones[2] = ftp * 0.90
 		zones[3] = ftp * 1.05
 		zones[4] = ftp * 1.20
+		zones[5] = ftp * 2.00
 		return zones
 	}
 

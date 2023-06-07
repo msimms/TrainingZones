@@ -115,12 +115,14 @@ struct ContentView: View {
 						}
 						HStack() {
 							if self.zonesVM.hasHrData() {
-								BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM", description: "")
-									.frame(height:256)
-								Text("")
-								Text("")
-								Text("BPM")
-									.bold()
+								VStack() {
+									BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM")
+										.frame(height:256)
+									Text("")
+									Text("")
+									Text("BPM")
+										.bold()
+								}
 							}
 						}
 					}
@@ -163,12 +165,14 @@ struct ContentView: View {
 						}
 						HStack() {
 							if self.zonesVM.hasPowerData() {
-								BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts", description: "")
-									.frame(height:256)
-								Text("")
-								Text("")
-								Text("Watts")
-									.bold()
+								VStack() {
+									BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts")
+										.frame(height:256)
+									Text("")
+									Text("")
+									Text("Watts")
+										.bold()
+								}
 							}
 						}
 					}
@@ -229,15 +233,18 @@ struct ContentView: View {
 						}
 						HStack() {
 							let runPaces = self.zonesVM.listRunTrainingPaces()
-							ForEach(runPaces.keys.sorted(), id:\.self) { paceName in
-								HStack() {
-									Text(paceName)
-										.bold()
-									Spacer()
-									let paceStr = self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!)
-									Text(paceStr)
+							VStack() {
+								ForEach([LONG_RUN_PACE_STR, EASY_RUN_PACE_STR, TEMPO_RUN_PACE_STR, FUNCTIONAL_THRESHOLD_PACE_STR], id:\.self) { paceName in
+									if runPaces[paceName] != nil {
+										HStack() {
+											Text(paceName)
+												.bold()
+											Spacer()
+											Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
+										}
+										.padding(.bottom, 3)
+									}
 								}
-								.padding(3)
 							}
 						}
 
