@@ -8,7 +8,9 @@ import HealthKit
 import CoreLocation
 
 class HealthManager : ObservableObject {
-	private let healthStore = HKHealthStore();
+	static let shared = HealthManager()
+
+	private let healthStore = HKHealthStore()
 	private var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
 	private var locationQueryGroup: DispatchGroup = DispatchGroup() // tracks location/route queries until they are completed
@@ -18,7 +20,7 @@ class HealthManager : ObservableObject {
 	@Published var vo2Max: Double?
 	@Published var ageInYears: Double?
 
-	init() {
+	private init() {
 	}
 	
 	func requestAuthorization() {
@@ -60,6 +62,12 @@ class HealthManager : ObservableObject {
 			}
 			catch {
 				NSLog("Failed to read the VO2Max from HealthKit.")
+			}
+			do {
+				try self.getBestRecent5KEffort()
+			}
+			catch {
+				NSLog("Failed to read the workout history from HealthKit.")
 			}
 		}
 	}
@@ -186,7 +194,6 @@ class HealthManager : ObservableObject {
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
 			if sample != nil {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-
 				self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
 			}
 		}
@@ -221,6 +228,35 @@ class HealthManager : ObservableObject {
 				self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
 			}
 		}
+	}
+
+	/// @brief Gets the user's best 5K effort from the last six months of HealthKit data.
+	func getBestRecent5KEffort() throws {
+		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - 86400.0 * 7.0 * 26.0)
+		let predicate = HKQuery.predicateForWorkouts(with: HKWorkoutActivityType.running)
+		let sortDescriptor = NSSortDescriptor.init(key: HKSampleSortIdentifierStartDate, ascending: false)
+		let quantityType = HKWorkoutType.workoutType()
+		let sampleQuery = HKSampleQuery.init(sampleType: quantityType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor], resultsHandler: { query, samples, error in
+			
+			if samples != nil {
+				for sample in samples! {
+					if let workout = sample as? HKWorkout {
+						if workout.startDate.timeIntervalSince1970 >= startDate.timeIntervalSince1970 {
+							let distance = workout.totalDistance
+							
+							if distance != nil {
+								if (distance?.doubleValue(for: HKUnit.meter()))! >= 5000.0 {
+								}
+							}
+						}
+					}
+				}
+			}
+			self.queryGroup.leave()
+		})
+		
+		self.queryGroup.enter()
+		self.healthStore.execute(sampleQuery)
 	}
 
 	func clearWorkoutsList() {

@@ -14,7 +14,7 @@ let WORKOUT_INPUT_EASY_RUN_PACE: String = "Easy Run Pace"
 let WORKOUT_INPUT_LONG_RUN_PACE: String = "Long Run Pace"
 
 class ZonesVM : ObservableObject {
-	@Published var healthMgr: HealthManager = HealthManager()
+	@Published var healthMgr: HealthManager = HealthManager.shared
 	@Published var best5KSecs: Double?
 	@Published var functionalThresholdPower: Double?
 
@@ -71,7 +71,7 @@ class ZonesVM : ObservableObject {
 	func listRunTrainingPaces() -> Dictionary<String, Double> {
 		var result: Dictionary<String, Double> = [:]
 		
-		if self.healthMgr.vo2Max != nil || self.best5KSecs != nil {
+		if self.healthMgr.vo2Max != nil || self.best5KSecs != nil || (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil) {
 			let calc: ZonesCalculator = ZonesCalculator()
 			let restingHr = self.healthMgr.restingHr ?? 0.0
 			let maxHr = self.healthMgr.maxHr ?? 0.0
