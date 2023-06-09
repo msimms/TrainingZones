@@ -15,7 +15,6 @@ let LONG_RUN_PACE_STR: String = "Long Run Pace"
 
 class ZonesVM : ObservableObject {
 	@Published var healthMgr: HealthManager = HealthManager.shared
-	@Published var best5KSecs: Double?
 	@Published var functionalThresholdPower: Double?
 
 	init() {
@@ -31,7 +30,7 @@ class ZonesVM : ObservableObject {
 	}
 
 	func hasRunData() -> Bool {
-		return self.healthMgr.vo2Max != nil || self.best5KSecs != nil
+		return self.healthMgr.vo2Max != nil || self.healthMgr.best5KDuration != nil
 	}
 
 	func listHrZones() -> Array<Bar> {
@@ -73,12 +72,12 @@ class ZonesVM : ObservableObject {
 	func listRunTrainingPaces() -> Dictionary<String, Double> {
 		var result: Dictionary<String, Double> = [:]
 		
-		if self.healthMgr.vo2Max != nil || self.best5KSecs != nil || (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil) {
+		if self.healthMgr.vo2Max != nil || self.healthMgr.best5KDuration != nil || (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil) {
 			let calc: ZonesCalculator = ZonesCalculator()
 			let restingHr = self.healthMgr.restingHr ?? 0.0
 			let maxHr = self.healthMgr.maxHr ?? 0.0
 			let vo2Max = self.healthMgr.vo2Max ?? 0.0
-			let best5KSecs = self.best5KSecs ?? 0.0
+			let best5KSecs = self.healthMgr.best5KDuration ?? 0
 			let ageInYears = self.healthMgr.ageInYears ?? 0.0
 			
 			result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)

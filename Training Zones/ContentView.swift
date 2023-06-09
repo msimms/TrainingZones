@@ -224,7 +224,7 @@ struct ContentView: View {
 								.fixedSize()
 								.onChange(of: self.best5KSecs.value) { value in
 									if let value = Double(self.best5KSecs.value) {
-										self.zonesVM.best5KSecs = value
+										self.zonesVM.healthMgr.best5KDuration = value
 									} else {
 										self.showingBest5KSecsError = true
 									}

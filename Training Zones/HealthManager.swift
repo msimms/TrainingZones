@@ -19,6 +19,7 @@ class HealthManager : ObservableObject {
 	@Published var maxHr: Double?
 	@Published var vo2Max: Double?
 	@Published var ageInYears: Double?
+	@Published var best5KDuration: TimeInterval?
 
 	private init() {
 	}
@@ -247,6 +248,9 @@ class HealthManager : ObservableObject {
 							
 							if distance != nil {
 								if (distance?.doubleValue(for: HKUnit.meter()))! >= 5000.0 {
+									if self.best5KDuration == nil || workout.duration < self.best5KDuration! {
+										self.best5KDuration = workout.duration
+									}
 								}
 							}
 						}
