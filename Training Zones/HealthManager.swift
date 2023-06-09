@@ -97,7 +97,8 @@ class HealthManager : ObservableObject {
 
 	func recentQuantitySamplesOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantitySample?, Error?) -> ()) {
 		
-		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - 86400.0 * 7.0 * 26.0)
+		let oneYear = (365.25 * 24.0 * 60.0 * 60.0)
+		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - oneYear)
 		let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: [.strictStartDate])
 
 		let query = HKSampleQuery.init(sampleType: quantityType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil, resultsHandler: { query, results, error in
