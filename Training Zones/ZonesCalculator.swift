@@ -71,7 +71,7 @@ class ZonesCalculator {
 		}
 		
 		// Second choice method: results of a recent hard effort.
-		else if best5KSecs > 0.0 {
+		else if best5KSecs > 600.0 {
 			paces = paceCalc.CalcFromRaceDistanceInMeters(restingHr: restingHr, maxHr: maxHr, raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
 		}
 

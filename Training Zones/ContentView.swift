@@ -9,8 +9,6 @@ struct ContentView: View {
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
 	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
-	@ObservedObject var vo2Max = NumbersOnly(initialDoubleValue: HealthManager.shared.vo2Max ?? 0.0)
-	@ObservedObject var best5KSecs = NumbersOnly(initialValue: 0)
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
 	@State private var showingVO2MaxError: Bool = false
@@ -201,35 +199,24 @@ struct ContentView: View {
 							Text("VO\u{00B2} Max:")
 								.bold()
 							Spacer()
-							TextField("ml/kg/min", text: self.$vo2Max.value)
-								.keyboardType(.decimalPad)
-								.multilineTextAlignment(.trailing)
-								.fixedSize()
-								.onChange(of: self.vo2Max.value) { value in
-									if let value = Double(self.vo2Max.value) {
-										self.healthMgr.vo2Max = value
-									} else {
-										self.showingVO2MaxError = true
-									}
-								}
+							if self.healthMgr.vo2Max != nil {
+								Text(String(self.healthMgr.vo2Max!))
 								Text("ml/kg/min")
+							}
+							else {
+								Text("Not Set")
+							}
 						}
 						HStack() {
-							Text("Best Recent 5 KM Effort:")
+							Text("Best Recent 5 KM (Or Greater) Effort:")
 								.bold()
 							Spacer()
-							TextField("seconds", text: self.$best5KSecs.value)
-								.keyboardType(.decimalPad)
-								.multilineTextAlignment(.trailing)
-								.fixedSize()
-								.onChange(of: self.best5KSecs.value) { value in
-									if let value = Double(self.best5KSecs.value) {
-										self.zonesVM.healthMgr.best5KDuration = value
-									} else {
-										self.showingBest5KSecsError = true
-									}
-								}
-							Text("seconds")
+							if self.healthMgr.best5KDuration != nil {
+								Text(self.formatAsHHMMSS(numSeconds: self.healthMgr.best5KDuration!))
+							}
+							else {
+								Text("Not Set")
+							}
 						}
 						HStack() {
 							let runPaces = self.zonesVM.listRunTrainingPaces()
@@ -264,6 +251,11 @@ struct ContentView: View {
 								}
 							}
 						}
+					}
+
+					// Notes
+					HStack() {
+						Text("Note: Values are either read or estimated from HealthKit data.")
 					}
 				}
 				.padding(10)
