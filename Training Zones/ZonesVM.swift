@@ -22,7 +22,7 @@ class ZonesVM : ObservableObject {
 	}
 
 	func hasHrData() -> Bool {
-		return self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil && self.healthMgr.ageInYears != nil
+		return self.healthMgr.ageInYears != nil
 	}
 
 	func hasPowerData() -> Bool {
@@ -36,12 +36,12 @@ class ZonesVM : ObservableObject {
 	func listHrZones() -> Array<Bar> {
 		var result: Array<Bar> = []
 
-		guard (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil && self.healthMgr.ageInYears != nil) else {
+		guard (self.healthMgr.ageInYears != nil) else {
 			return result
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
-		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr!, maxHr: self.healthMgr.maxHr!, ageInYears: self.healthMgr.ageInYears!)
+		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.maxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
 
 		for zoneNum in 0...4 {
