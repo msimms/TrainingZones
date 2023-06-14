@@ -13,7 +13,7 @@ struct ContentView: View {
 	@State private var showingFtpError: Bool = false
 	@State private var showingVO2MaxError: Bool = false
 	@State private var showingBest5KSecsError: Bool = false
-	@State private var units: String = "Metric"
+	@State private var units: String = Preferences.preferredUnitSystem()
 
 	/// @brief Utility function for converting a number of seconds into HH:MMSS format
 	func formatAsHHMMSS(numSeconds: Double) -> String {
@@ -39,19 +39,19 @@ struct ContentView: View {
 		return String(format: "%02d:%02d", minutes, seconds)
 	}
 
-	func convertPaceToDisplayString(paceMetersMin: Double) -> String {
-		if paceMetersMin > 0.0 {
+	func convertPaceToDisplayString(paceMetersPerMin: Double) -> String {
+		if paceMetersPerMin > 0.0 {
 			if self.units == "Metric" {
-				let paceKmMin = (1000.0 / paceMetersMin) * 60.0
-				return self.formatAsHHMMSS(numSeconds: paceKmMin) + " min/km"
+				let paceSecPerKm = 60.0 / (paceMetersPerMin / 1000.0)
+				return self.formatAsHHMMSS(numSeconds: paceSecPerKm) + " min/km"
 			}
 			else if self.units == "Imperial" {
 				let METERS_PER_MILE = 1609.34
-				let paceKmMin = (METERS_PER_MILE / paceMetersMin) * 60.0
-				return self.formatAsHHMMSS(numSeconds: paceKmMin) + " min/mile"
+				let paceSecPerMile = 60.0 / (paceMetersPerMin / METERS_PER_MILE)
+				return self.formatAsHHMMSS(numSeconds: paceSecPerMile) + " min/mile"
 			}
 		}
-		return String(paceMetersMin)
+		return String(paceMetersPerMin)
 	}
 
 	var body: some View {
@@ -211,6 +211,7 @@ struct ContentView: View {
 							Text("Not Set")
 						}
 					}
+					Spacer()
 					HStack() {
 						let runPaces = self.zonesVM.listRunTrainingPaces()
 						VStack() {
@@ -220,7 +221,7 @@ struct ContentView: View {
 										Text(paceName)
 											.bold()
 										Spacer()
-										Text(self.convertPaceToDisplayString(paceMetersMin: runPaces[paceName]!))
+										Text(self.convertPaceToDisplayString(paceMetersPerMin: runPaces[paceName]!))
 									}
 									.padding(.bottom, 3)
 								}
@@ -240,6 +241,7 @@ struct ContentView: View {
 							ForEach(["Metric", "Imperial"], id: \.self) { item in
 								Button(item) {
 									self.units = item
+									Preferences.setPreferredUnitSystem(system: item)
 								}
 							}
 						}

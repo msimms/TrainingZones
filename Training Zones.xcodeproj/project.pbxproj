@@ -10,6 +10,7 @@
 		275C8F5C2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F5B2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift */; };
 		275C8F5E2A20310A00EA7BE4 /* VO2MaxCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F5D2A20310A00EA7BE4 /* VO2MaxCalculator.swift */; };
 		275C8F662A27CD1C00EA7BE4 /* NumbersOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */; };
+		27854D002A3A533E005E4B16 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27854CFF2A3A533E005E4B16 /* Preferences.swift */; };
 		27B8813D2A1FCB16005A632F /* Training_ZonesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B8813C2A1FCB16005A632F /* Training_ZonesApp.swift */; };
 		27B8813F2A1FCB16005A632F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B8813E2A1FCB16005A632F /* ContentView.swift */; };
 		27B881412A1FCB17005A632F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27B881402A1FCB17005A632F /* Assets.xcassets */; };
@@ -44,6 +45,7 @@
 		275C8F5B2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlaceCalculator.swift; sourceTree = "<group>"; };
 		275C8F5D2A20310A00EA7BE4 /* VO2MaxCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VO2MaxCalculator.swift; sourceTree = "<group>"; };
 		275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumbersOnly.swift; sourceTree = "<group>"; };
+		27854CFF2A3A533E005E4B16 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		27B881392A1FCB16005A632F /* Training Zones.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Training Zones.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B8813C2A1FCB16005A632F /* Training_ZonesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Training_ZonesApp.swift; sourceTree = "<group>"; };
 		27B8813E2A1FCB16005A632F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				27B8813E2A1FCB16005A632F /* ContentView.swift */,
 				27B881672A1FEEA8005A632F /* HealthManager.swift */,
 				275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */,
+				27854CFF2A3A533E005E4B16 /* Preferences.swift */,
 				27B8813C2A1FCB16005A632F /* Training_ZonesApp.swift */,
 				275C8F5B2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift */,
 				275C8F5D2A20310A00EA7BE4 /* VO2MaxCalculator.swift */,
@@ -282,6 +285,7 @@
 			files = (
 				275C8F5E2A20310A00EA7BE4 /* VO2MaxCalculator.swift in Sources */,
 				275C8F662A27CD1C00EA7BE4 /* NumbersOnly.swift in Sources */,
+				27854D002A3A533E005E4B16 /* Preferences.swift in Sources */,
 				27B8813F2A1FCB16005A632F /* ContentView.swift in Sources */,
 				27B881692A1FEEA8005A632F /* HealthManager.swift in Sources */,
 				27B8816C2A1FEED7005A632F /* BarChartView.swift in Sources */,

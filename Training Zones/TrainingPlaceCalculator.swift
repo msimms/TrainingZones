@@ -18,7 +18,7 @@ enum TrainingPaceType {
 class TrainingPlaceCalculator {
 
 	func ConvertToSpeed(vo2max: Double) -> Double {
-		return 29.54 + 5.000663 * vo2max - 0.007546 * vo2max * vo2max;
+		return 29.54 + 5.000663 * vo2max - 0.007546 * vo2max * vo2max
 	}
 
 	// Give the athlete's VO2Max, returns the suggested long run, easy run, tempo run, and speed run paces.
@@ -31,12 +31,15 @@ class TrainingPlaceCalculator {
 		// 10000 meters 88-92%
 		// Half Marathon 85-88%%
 		// Marathon 82-85%
-	
+		// Long Run Pace 60%
+		// Easy Pace 70%
+		// Tempo Pace 88%
+
 		var longRunPace: Double = vo2max * 0.6
 		var easyPace: Double = vo2max * 0.7
 		var marathonPace: Double = vo2max * 0.82
 		var tempoPace: Double = vo2max * 0.88
-		var functionalThresholdPace: Double = vo2max
+		var functionalThresholdPace: Double = vo2max * 0.90
 		var speedPace: Double = vo2max * 1.1
 		var shortIntervalPace: Double = vo2max * 1.15
 	
