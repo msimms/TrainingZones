@@ -134,7 +134,7 @@ struct ContentView: View {
 					HStack() {
 						if self.zonesVM.hasHrData() {
 							VStack() {
-								BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM")
+								BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM", description: self.zonesVM.hrZonesDescription)
 									.frame(height:256)
 								Text("")
 								Text("")
@@ -182,7 +182,7 @@ struct ContentView: View {
 					HStack() {
 						if self.zonesVM.hasPowerData() {
 							VStack() {
-								BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts")
+								BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts", description: self.zonesVM.powerZonesDescription)
 									.frame(height:256)
 								Text("")
 								Text("")

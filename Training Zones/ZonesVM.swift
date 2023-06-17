@@ -38,6 +38,8 @@ let LONG_RUN_PACE_STR: String = "Long Run Pace"
 class ZonesVM : ObservableObject {
 	@Published var healthMgr: HealthManager = HealthManager.shared
 	@Published var functionalThresholdPower: Double?
+	var hrZonesDescription: String = ""
+	var powerZonesDescription: String = ""
 
 	init() {
 		self.healthMgr.requestAuthorization()
@@ -66,9 +68,16 @@ class ZonesVM : ObservableObject {
 		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.maxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
 
+		self.hrZonesDescription = ""
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
 			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+
+			self.hrZonesDescription += "Zone "
+			self.hrZonesDescription += String(zoneNum)
+			self.hrZonesDescription += " : "
+			self.hrZonesDescription += descriptions[zoneNum]
+			self.hrZonesDescription += "\n"
 		}
 		return result
 	}
@@ -84,9 +93,16 @@ class ZonesVM : ObservableObject {
 		let zones = calc.CalcuatePowerZones(ftp: self.functionalThresholdPower!)
 		let descriptions = ["Recovery", "Endurance", "Tempo", "Lactate Threshold", "VO2 Max", "Anaerobic Capacity", "Neuromuscular Power"]
 
+		self.powerZonesDescription = ""
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
 			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+
+			self.powerZonesDescription += "Zone "
+			self.powerZonesDescription += String(zoneNum)
+			self.powerZonesDescription += " : "
+			self.powerZonesDescription += descriptions[zoneNum]
+			self.powerZonesDescription += "\n"
 		}
 		return result
 	}
