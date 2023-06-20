@@ -233,6 +233,17 @@ struct ContentView: View {
 							Text("Not Set")
 						}
 					}
+					HStack() {
+						Text("Best Recent 12 Minute Effort (Cooper Test):")
+							.bold()
+						Spacer()
+						if self.healthMgr.best12MinuteEffort != nil {
+							Text(String(format: "%.1f", self.healthMgr.best12MinuteEffort!))
+						}
+						else {
+							Text("Not Set")
+						}
+					}
 					Spacer()
 					HStack() {
 						let runPaces = self.zonesVM.listRunTrainingPaces()

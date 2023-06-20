@@ -84,7 +84,13 @@ class TrainingPlaceCalculator {
 		return paces
 	}
 
-	func CalcFromRaceDistanceInMeters(restingHr: Double, maxHr: Double, raceDurationSecs: Double, raceDistanceMeters: Double) -> Dictionary<TrainingPaceType, Double> {
+	func CalcFromUsingCooperTest(cooperTestMeters: Double) -> Dictionary<TrainingPaceType, Double> {
+		let v02MaxCalc: VO2MaxCalculator = VO2MaxCalculator()
+		let vo2max = v02MaxCalc.EstimateVO2MaxUsingCooperTestMetric(kms: cooperTestMeters / 1000.0)
+		return self.CalcFromVO2Max(vo2max: vo2max)
+	}
+
+	func CalcFromRaceDistanceInMeters(raceDurationSecs: Double, raceDistanceMeters: Double) -> Dictionary<TrainingPaceType, Double> {
 		let v02MaxCalc: VO2MaxCalculator = VO2MaxCalculator()
 		let vo2max = v02MaxCalc.EstimateVO2MaxFromRaceDistanceInMeters(raceDistanceMeters: raceDistanceMeters, raceTimeSecs: raceDurationSecs)
 		return self.CalcFromVO2Max(vo2max: vo2max)

@@ -28,6 +28,14 @@
 import Foundation
 
 class VO2MaxCalculator {
+	func EstimateVO2MaxUsingCooperTestMetric(kms: Double) -> Double {
+		return (22.351 * kms) - 11.288
+	}
+
+	func EstimateVO2MaxUsingCooperTestImperial(miles: Double) -> Double {
+		return (25.97 * miles) - 11.29
+	}
+
 	func EstimateVO2MaxFromHeartRate(maxHR: Double, restingHR: Double) -> Double {
 		return 15.3 * (maxHR / restingHR)
 	}

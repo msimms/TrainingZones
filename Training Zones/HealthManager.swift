@@ -41,7 +41,8 @@ class HealthManager : ObservableObject {
 	@Published var maxHr: Double?
 	@Published var vo2Max: Double?
 	@Published var ageInYears: Double?
-	@Published var best5KDuration: TimeInterval?
+	@Published var best5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
+	@Published var best12MinuteEffort: Double? // Best 12 minute effort, in meters
 
 	private init() {
 	}
@@ -87,7 +88,7 @@ class HealthManager : ObservableObject {
 				NSLog("Failed to read the VO2Max from HealthKit.")
 			}
 			do {
-				try self.getBestRecent5KEffort()
+				try self.getBestRecentEfforts()
 			}
 			catch {
 				NSLog("Failed to read the workout history from HealthKit.")
@@ -254,8 +255,8 @@ class HealthManager : ObservableObject {
 		}
 	}
 
-	/// @brief Gets the user's best 5K effort from the last six months of HealthKit data.
-	func getBestRecent5KEffort() throws {
+	/// @brief Gets the user's best 5K and 12 minute efforts from the last six months of HealthKit data.
+	func getBestRecentEfforts() throws {
 		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - 86400.0 * 7.0 * 26.0)
 		let predicate = HKQuery.predicateForWorkouts(with: HKWorkoutActivityType.running)
 		let sortDescriptor = NSSortDescriptor.init(key: HKSampleSortIdentifierStartDate, ascending: false)
@@ -267,11 +268,26 @@ class HealthManager : ObservableObject {
 					if let workout = sample as? HKWorkout {
 						if workout.startDate.timeIntervalSince1970 >= startDate.timeIntervalSince1970 {
 							let distance = workout.totalDistance
-							
+							let duration = workout.duration
+
 							if distance != nil {
-								if (distance?.doubleValue(for: HKUnit.meter()))! >= 5000.0 {
+								let distanceMeters = distance?.doubleValue(for: HKUnit.meter())
+
+								// Is this our best recent 5K?
+								if distanceMeters! >= 5000.0 {
 									if self.best5KDuration == nil || workout.duration < self.best5KDuration! {
-										self.best5KDuration = workout.duration
+										DispatchQueue.main.async {
+											self.best5KDuration = workout.duration
+										}
+									}
+								}
+
+								// Is this our best recent 12 minute effort? Effort has to be between 12:00 and 12:10 in duration.
+								if duration >= 12 * 60 && duration <= (12 * 60) + 10 {
+									if self.best12MinuteEffort == nil || distanceMeters! >= self.best12MinuteEffort! {
+										DispatchQueue.main.async {
+											self.best12MinuteEffort = distanceMeters
+										}
 									}
 								}
 							}

@@ -116,13 +116,14 @@ class ZonesVM : ObservableObject {
 			let maxHr = self.healthMgr.maxHr ?? 0.0
 			let vo2Max = self.healthMgr.vo2Max ?? 0.0
 			let best5KSecs = self.healthMgr.best5KDuration ?? 0
+			let cooperTestMeters = self.healthMgr.best12MinuteEffort ?? 0
 			let ageInYears = self.healthMgr.ageInYears ?? 0.0
 			
-			result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[EASY_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[MARATHON_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[TEMPO_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[FUNCTIONAL_THRESHOLD_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[EASY_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[MARATHON_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[TEMPO_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			result[FUNCTIONAL_THRESHOLD_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
 		}
 		return result
 	}

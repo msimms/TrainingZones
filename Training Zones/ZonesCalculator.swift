@@ -83,7 +83,7 @@ class ZonesCalculator {
 		return zones
 	}
 
-	func GetRunTrainingPace(zone: TrainingPaceType, vo2Max: Double, best5KSecs: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
+	func GetRunTrainingPace(zone: TrainingPaceType, vo2Max: Double, best5KSecs: Double, cooperTestMeters: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
 		let paceCalc: TrainingPlaceCalculator = TrainingPlaceCalculator()
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
 
@@ -92,12 +92,17 @@ class ZonesCalculator {
 			paces = paceCalc.CalcFromVO2Max(vo2max: vo2Max)
 		}
 		
-		// Second choice method: results of a recent hard effort.
-		else if best5KSecs > 600.0 {
-			paces = paceCalc.CalcFromRaceDistanceInMeters(restingHr: restingHr, maxHr: maxHr, raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
+		// Next choice: Cooper Test.
+		else if cooperTestMeters > 100.0 {
+			paces = paceCalc.CalcFromUsingCooperTest(cooperTestMeters: cooperTestMeters)
 		}
-
-		// Third choice method: from heart rate.
+		
+		// Next choice: results of a recent hard effort.
+		else if best5KSecs > 600.0 {
+			paces = paceCalc.CalcFromRaceDistanceInMeters(raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
+		}
+		
+		// Next choice: from heart rate.
 		else if restingHr > 1.0 && maxHr > 1.0 {
 			paces = paceCalc.CalcFromHR(restingHr: restingHr, maxHr: maxHr)
 		}
