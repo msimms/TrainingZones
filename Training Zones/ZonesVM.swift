@@ -57,21 +57,23 @@ class ZonesVM : ObservableObject {
 		return self.healthMgr.vo2Max != nil || self.healthMgr.best5KDuration != nil
 	}
 
-	func listHrZones() -> Array<Bar> {
-		var result: Array<Bar> = []
+	func listHrZones() -> (Array<Bar>, String) {
+		var zoneBars: Array<Bar> = []
 
 		guard (self.healthMgr.ageInYears != nil) else {
-			return result
+			return (zoneBars, "")
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
-		let zones = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.maxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
+		let hrZonesResult = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.maxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
+		let zoneMaxValues = hrZonesResult.0
+		let algorithmName = hrZonesResult.1
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
 
 		self.hrZonesDescription = ""
 		for zoneNum in 0...4 {
-			let zoneValue = zones[zoneNum]
-			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+			let zoneValue = zoneMaxValues[zoneNum]
+			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 
 			self.hrZonesDescription += "Zone "
 			self.hrZonesDescription += String(zoneNum)
@@ -79,14 +81,14 @@ class ZonesVM : ObservableObject {
 			self.hrZonesDescription += descriptions[zoneNum]
 			self.hrZonesDescription += "\n"
 		}
-		return result
+		return (zoneBars, algorithmName)
 	}
 
 	func listPowerZones() -> Array<Bar> {
-		var result: Array<Bar> = []
+		var zoneBars: Array<Bar> = []
 
 		guard (self.functionalThresholdPower != nil) else {
-			return result
+			return zoneBars
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
@@ -96,7 +98,7 @@ class ZonesVM : ObservableObject {
 		self.powerZonesDescription = ""
 		for zoneNum in 0...4 {
 			let zoneValue = zones[zoneNum]
-			result.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 
 			self.powerZonesDescription += "Zone "
 			self.powerZonesDescription += String(zoneNum)
@@ -104,7 +106,7 @@ class ZonesVM : ObservableObject {
 			self.powerZonesDescription += descriptions[zoneNum]
 			self.powerZonesDescription += "\n"
 		}
-		return result
+		return zoneBars
 	}
 
 	func listRunTrainingPaces() -> Dictionary<String, Double> {

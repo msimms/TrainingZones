@@ -30,14 +30,19 @@ import Foundation
 let NUM_HR_ZONES = 5
 let NUM_POWER_ZONES = 6
 
+let HR_ALGORITHM_NAME_AGE = "Estimated Maximum Heart Rate"
+let HR_ALGORITHM_NAME_MAX_HR = "Actual Maximum Heart Rate"
+let HR_ALGORITHM_NAME_HR_RESERVE = "Heart Rate Reserve (Karvonen Formula)"
+
 class ZonesCalculator {
 	func EstimateMaxHrFromAge(ageInYears: Double) -> Double {
 		// Use the Oakland nonlinear formula to estimate based on age.
 		return 192.0 - (0.007 * (ageInYears * ageInYears))
 	}
 	
-	func CalculateHeartRateZones(restingHr: Double, maxHr: Double, ageInYears: Double) -> [Double] {
+	func CalculateHeartRateZones(restingHr: Double, maxHr: Double, ageInYears: Double) -> ([Double], String) {
 		var zones = Array(repeating: 0.0, count: NUM_HR_ZONES)
+		var algorithmName: String = ""
 
 		// If given resting and max heart rates, use the Karvonen formula for determining zones based on hr reserve.
 		if restingHr > 1.0 && maxHr > 1.0 {
@@ -46,6 +51,7 @@ class ZonesCalculator {
 			zones[2] = ((maxHr - restingHr) * 0.80) + restingHr
 			zones[3] = ((maxHr - restingHr) * 0.90) + restingHr
 			zones[4] = maxHr
+			algorithmName = HR_ALGORITHM_NAME_HR_RESERVE
 		}
 
 		// Maximum heart rate, but no resting heart rate.
@@ -55,6 +61,7 @@ class ZonesCalculator {
 			zones[2] = maxHr * 0.80
 			zones[3] = maxHr * 0.90
 			zones[4] = maxHr
+			algorithmName = HR_ALGORITHM_NAME_MAX_HR
 		}
 
 		// No heart rate information, estimate it based on age and then generate the zones.
@@ -65,9 +72,10 @@ class ZonesCalculator {
 			zones[2] = maxHr * 0.80
 			zones[3] = maxHr * 0.90
 			zones[4] = maxHr
+			algorithmName = HR_ALGORITHM_NAME_AGE
 		}
 
-		return zones
+		return (zones, algorithmName)
 	}
 
 	func CalcuatePowerZones(ftp: Double) -> [Double] {

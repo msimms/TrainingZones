@@ -31,12 +31,13 @@ struct ContentView: View {
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
 	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
+	@State private var showingHrAlgorithmSelection: Bool = false
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
 	@State private var showingVO2MaxError: Bool = false
 	@State private var showingBest5KSecsError: Bool = false
 	@State private var units: String = Preferences.preferredUnitSystem()
-
+	
 	/// @brief Utility function for converting a number of seconds into HH:MMSS format
 	func formatAsHHMMSS(numSeconds: Double) -> String {
 		let SECS_PER_DAY  = 86400
@@ -134,13 +135,15 @@ struct ContentView: View {
 					HStack() {
 						if self.zonesVM.hasHrData() {
 							VStack() {
-								BarChartView(bars: self.zonesVM.listHrZones(), color: Color.red, units: "BPM", description: self.zonesVM.hrZonesDescription)
+								let hrZonesResult = self.zonesVM.listHrZones()
+								BarChartView(bars: hrZonesResult.0, color: Color.red, units: "BPM", description: self.zonesVM.hrZonesDescription)
 									.frame(height:256)
 								Text("")
 								Text("")
 								Text("BPM")
 									.bold()
-								Text("Note: The Karvonen formula (i.e. heart rate reserve) is used if the resting heart rate is known and maximum heart rate can be calculated.")
+								Text("Calculated using\n" + hrZonesResult.1)
+									.multilineTextAlignment(.center)
 							}
 						}
 					}
