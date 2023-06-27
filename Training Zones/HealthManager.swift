@@ -33,10 +33,7 @@ class HealthManager : ObservableObject {
 	static let shared = HealthManager()
 
 	private let healthStore = HKHealthStore()
-	private var workouts: Dictionary<String, HKWorkout> = [:] // summaries of workouts stored in the health store, key is the activity ID which is generated automatically
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
-	private var locationQueryGroup: DispatchGroup = DispatchGroup() // tracks location/route queries until they are completed
-	private var hrQuery: HKQuery? = nil // the query that reads heart rate on the watch
 	@Published var restingHr: Double?
 	@Published var maxHr: Double?
 	@Published var vo2Max: Double?
@@ -302,101 +299,8 @@ class HealthManager : ObservableObject {
 		self.healthStore.execute(sampleQuery)
 	}
 
-	func clearWorkoutsList() {
-		self.workouts.removeAll()
-	}
-	
-	func readWorkoutsFromHealthStoreOfType(activityType: HKWorkoutActivityType) {
-		let predicate = HKQuery.predicateForWorkouts(with: activityType)
-		let sortDescriptor = NSSortDescriptor.init(key: HKSampleSortIdentifierStartDate, ascending: false)
-		let quantityType = HKWorkoutType.workoutType()
-		let sampleQuery = HKSampleQuery.init(sampleType: quantityType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor], resultsHandler: { query, samples, error in
-
-			if samples != nil {
-				for sample in samples! {
-					if let workout = sample as? HKWorkout {
-						self.workouts[UUID().uuidString] = workout
-					}
-				}
-			}
-			self.queryGroup.leave()
-		})
-
-		self.queryGroup.enter()
-		self.healthStore.execute(sampleQuery)
-	}
-	
-	func readRunningWorkoutsFromHealthStore() {
-		self.readWorkoutsFromHealthStoreOfType(activityType: HKWorkoutActivityType.running)
-	}
-
-	func readWalkingWorkoutsFromHealthStore() {
-		self.readWorkoutsFromHealthStoreOfType(activityType: HKWorkoutActivityType.walking)
-	}
-
-	func readCyclingWorkoutsFromHealthStore() {
-		self.readWorkoutsFromHealthStoreOfType(activityType: HKWorkoutActivityType.cycling)
-	}
-
-	func readAllActivitiesFromHealthStore() {
-		self.clearWorkoutsList()
-		self.readRunningWorkoutsFromHealthStore()
-		self.readWalkingWorkoutsFromHealthStore()
-		self.readCyclingWorkoutsFromHealthStore()
-		self.waitForHealthKitQueries()
-	}
-
-	private func readLocationPointsFromHealthStoreForWorkoutRoute(route: HKWorkoutRoute, activityId: String) {
-		let query = HKWorkoutRouteQuery.init(route: route) { _, routeData, done, error in
-
-			if done {
-				self.queryGroup.leave()
-			}
-		}
-
-		self.queryGroup.enter()
-		self.healthStore.execute(query)
-	}
-
-	func readLocationPointsFromHealthStoreForWorkout(workout: HKWorkout, activityId: String) {
-		let predicate = HKQuery.predicateForObjects(from: workout)
-		let sampleType = HKSeriesType.workoutRoute()
-		let query = HKAnchoredObjectQuery.init(type: sampleType, predicate: predicate, anchor: nil, limit: HKObjectQueryNoLimit, resultsHandler: { _, samples, _, _, error in
-
-			if samples != nil {
-				for sample in samples! {
-					if let route = sample as? HKWorkoutRoute {
-						self.readLocationPointsFromHealthStoreForWorkoutRoute(route: route, activityId: activityId)
-					}
-				}
-			}
-
-			self.queryGroup.leave()
-		})
-
-		self.queryGroup.enter()
-		self.healthStore.execute(query)
-		self.waitForHealthKitQueries()
-	}
-
-	func readLocationPointsFromHealthStoreForActivityId(activityId: String) {
-		guard let workout = self.workouts[activityId] else {
-			return
-		}
-		self.readLocationPointsFromHealthStoreForWorkout(workout: workout, activityId: activityId)
-	}
-
 	/// @brief Blocks until all HealthKit queries have completed.
 	func waitForHealthKitQueries() {
 		self.queryGroup.wait()
-	}
-
-	func unsubscribeFromHeartRateUpdates() {
-		guard self.hrQuery != nil else {
-			return
-		}
-
-		self.healthStore.stop(self.hrQuery!)
-		self.hrQuery = nil
 	}
 }
