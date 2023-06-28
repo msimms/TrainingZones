@@ -286,7 +286,7 @@ class HealthManager : ObservableObject {
 								let pace = workout.duration / distanceMeters!
 
 								// Is this our best recent 5K?
-								if distanceMeters! >= 5000.0 && distanceMeters! < 5100.0 {
+								if distanceMeters! >= 5000.0 {
 									if tempBest5KDuration == nil || pace <= best5KPace {
 										best5KPace = pace
 										tempBest5KDuration = durationSecs

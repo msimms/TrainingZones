@@ -244,9 +244,8 @@ struct ContentView: View {
 						Text("Best Recent 5 KM (Or Greater) Effort:")
 							.bold()
 						Spacer()
-						if self.healthMgr.best5KDuration != nil {
-							Text(self.formatAsHHMMSS(numSeconds: self.healthMgr.best5KDuration!))
-							Text(" (" + self.convertPaceToDisplayString(paceSecsPerMeter: self.healthMgr.best5KPace!) + ")")
+						if self.healthMgr.best5KPace != nil {
+							Text(self.convertPaceToDisplayString(paceSecsPerMeter: self.healthMgr.best5KPace!))
 						}
 						else {
 							Text("Not Set")
