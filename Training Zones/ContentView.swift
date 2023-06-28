@@ -62,19 +62,34 @@ struct ContentView: View {
 		return String(format: "%02d:%02d", minutes, seconds)
 	}
 
-	func convertPaceToDisplayString(paceMetersPerMin: Double) -> String {
-		if paceMetersPerMin > 0.0 {
+	func convertSpeedToPaceDisplayString(speedMetersPerMin: Double) -> String {
+		if speedMetersPerMin > 0.0 {
 			if self.units == "Metric" {
-				let paceSecPerKm = 60.0 / (paceMetersPerMin / 1000.0)
+				let paceSecPerKm = 60.0 / (speedMetersPerMin / 1000.0)
 				return self.formatAsHHMMSS(numSeconds: paceSecPerKm) + " min/km"
 			}
 			else if self.units == "Imperial" {
 				let METERS_PER_MILE = 1609.34
-				let paceSecPerMile = 60.0 / (paceMetersPerMin / METERS_PER_MILE)
+				let paceSecPerMile = 60.0 / (speedMetersPerMin / METERS_PER_MILE)
 				return self.formatAsHHMMSS(numSeconds: paceSecPerMile) + " min/mile"
 			}
 		}
-		return String(paceMetersPerMin)
+		return String(speedMetersPerMin)
+	}
+
+	func convertPaceToDisplayString(paceSecsPerMeter: Double) -> String {
+		if paceSecsPerMeter > 0.0 {
+			if self.units == "Metric" {
+				let paceSecPerKm = paceSecsPerMeter * 1000.0
+				return self.formatAsHHMMSS(numSeconds: paceSecPerKm) + " min/km"
+			}
+			else if self.units == "Imperial" {
+				let METERS_PER_MILE = 1609.34
+				let paceSecPerMile = paceSecsPerMeter * METERS_PER_MILE
+				return self.formatAsHHMMSS(numSeconds: paceSecPerMile) + " min/mile"
+			}
+		}
+		return String(paceSecsPerMeter)
 	}
 
 	var body: some View {
@@ -231,6 +246,7 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.best5KDuration != nil {
 							Text(self.formatAsHHMMSS(numSeconds: self.healthMgr.best5KDuration!))
+							Text(" (" + self.convertPaceToDisplayString(paceSecsPerMeter: self.healthMgr.best5KPace!) + ")")
 						}
 						else {
 							Text("Not Set")
@@ -257,7 +273,7 @@ struct ContentView: View {
 										Text(paceName)
 											.bold()
 										Spacer()
-										Text(self.convertPaceToDisplayString(paceMetersPerMin: runPaces[paceName]!))
+										Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPaces[paceName]!))
 									}
 									.padding(.bottom, 3)
 								}

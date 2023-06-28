@@ -39,6 +39,7 @@ class HealthManager : ObservableObject {
 	@Published var vo2Max: Double?
 	@Published var ageInYears: Double?
 	@Published var best5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
+	@Published var best5KPace: Double? // Best 5K (or greater) effort, in pace
 	@Published var best12MinuteEffort: Double? // Best 12 minute effort, in meters
 
 	private init() {
@@ -205,7 +206,9 @@ class HealthManager : ObservableObject {
 
 		if tempDate != nil {
 			let SECS_PER_YEAR = 365.25 * 24.0 * 60.0 * 60.0
-			self.ageInYears = (Date.now.timeIntervalSince1970 - tempDate!.timeIntervalSince1970) / SECS_PER_YEAR
+			DispatchQueue.main.async {
+				self.ageInYears = (Date.now.timeIntervalSince1970 - tempDate!.timeIntervalSince1970) / SECS_PER_YEAR
+			}
 		}
 	}
 
@@ -216,7 +219,9 @@ class HealthManager : ObservableObject {
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
 			if sample != nil {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-				self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
+				DispatchQueue.main.async {
+					self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
+				}
 			}
 		}
 	}
@@ -231,7 +236,9 @@ class HealthManager : ObservableObject {
 				let hrValue = sample!.quantity.doubleValue(for: hrUnit)
 
 				if self.maxHr == nil || hrValue > self.maxHr! {
-					self.maxHr = hrValue
+					DispatchQueue.main.async {
+						self.maxHr = hrValue
+					}
 				}
 			}
 		}
@@ -247,7 +254,9 @@ class HealthManager : ObservableObject {
 				let mL = HKUnit.literUnit(with: .milli)
 				let vo2MaxUnit = mL.unitDivided(by: kgmin)
 
-				self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
+				DispatchQueue.main.async {
+					self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
+				}
 			}
 		}
 	}
@@ -261,6 +270,10 @@ class HealthManager : ObservableObject {
 		let sampleQuery = HKSampleQuery.init(sampleType: quantityType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor], resultsHandler: { query, samples, error in
 			
 			if samples != nil {
+				var tempBest5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
+				var tempBest12MinuteEffort: Double? // Best 12 minute effort, in meters
+				var best5KPace: Double = 0.0 // Pace in seconds per meter
+
 				for sample in samples! {
 					if let workout = sample as? HKWorkout {
 						if workout.startDate.timeIntervalSince1970 >= startDate.timeIntervalSince1970 {
@@ -269,29 +282,35 @@ class HealthManager : ObservableObject {
 
 							if distance != nil {
 								let distanceMeters = distance?.doubleValue(for: HKUnit.meter())
+								let durationSecs = workout.duration
+								let pace = workout.duration / distanceMeters!
 
 								// Is this our best recent 5K?
-								if distanceMeters! >= 5000.0 {
-									if self.best5KDuration == nil || workout.duration < self.best5KDuration! {
-										DispatchQueue.main.async {
-											self.best5KDuration = workout.duration
-										}
+								if distanceMeters! >= 5000.0 && distanceMeters! < 5100.0 {
+									if tempBest5KDuration == nil || pace <= best5KPace {
+										best5KPace = pace
+										tempBest5KDuration = durationSecs
 									}
 								}
 
 								// Is this our best recent 12 minute effort? Effort has to be between 12:00 and 12:10 in duration.
 								if duration >= 12 * 60 && duration <= (12 * 60) + 10 {
-									if self.best12MinuteEffort == nil || distanceMeters! >= self.best12MinuteEffort! {
-										DispatchQueue.main.async {
-											self.best12MinuteEffort = distanceMeters
-										}
+									if tempBest12MinuteEffort == nil || distanceMeters! >= self.best12MinuteEffort! {
+										tempBest12MinuteEffort = distanceMeters
 									}
 								}
 							}
 						}
 					}
 				}
+
+				DispatchQueue.main.async {
+					self.best5KDuration = tempBest5KDuration
+					self.best5KPace = best5KPace
+					self.best12MinuteEffort = tempBest12MinuteEffort
+				}
 			}
+
 			self.queryGroup.leave()
 		})
 		
