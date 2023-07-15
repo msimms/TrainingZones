@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27091ABF2A6306F80013AD48 /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27091ABE2A6306F80013AD48 /* BarChartView.swift */; };
 		275C8F5C2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F5B2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift */; };
 		275C8F5E2A20310A00EA7BE4 /* VO2MaxCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F5D2A20310A00EA7BE4 /* VO2MaxCalculator.swift */; };
 		275C8F662A27CD1C00EA7BE4 /* NumbersOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */; };
@@ -20,7 +21,6 @@
 		27B8815B2A1FCB18005A632F /* Training_ZonesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B8815A2A1FCB18005A632F /* Training_ZonesUITestsLaunchTests.swift */; };
 		27B881692A1FEEA8005A632F /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B881672A1FEEA8005A632F /* HealthManager.swift */; };
 		27B8816A2A1FEEA8005A632F /* ZonesVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B881682A1FEEA8005A632F /* ZonesVM.swift */; };
-		27B8816C2A1FEED7005A632F /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B8816B2A1FEED7005A632F /* BarChartView.swift */; };
 		27B8816E2A1FF871005A632F /* ZonesCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B8816D2A1FF871005A632F /* ZonesCalculator.swift */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		27091ABE2A6306F80013AD48 /* BarChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BarChartView.swift; path = SimpleSwiftCharts/BarChartView.swift; sourceTree = SOURCE_ROOT; };
 		275C8F5B2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlaceCalculator.swift; sourceTree = "<group>"; };
 		275C8F5D2A20310A00EA7BE4 /* VO2MaxCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VO2MaxCalculator.swift; sourceTree = "<group>"; };
 		275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumbersOnly.swift; sourceTree = "<group>"; };
@@ -59,7 +60,6 @@
 		27B8815A2A1FCB18005A632F /* Training_ZonesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Training_ZonesUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		27B881672A1FEEA8005A632F /* HealthManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthManager.swift; sourceTree = "<group>"; };
 		27B881682A1FEEA8005A632F /* ZonesVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZonesVM.swift; sourceTree = "<group>"; };
-		27B8816B2A1FEED7005A632F /* BarChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarChartView.swift; sourceTree = "<group>"; };
 		27B8816D2A1FF871005A632F /* ZonesCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZonesCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -111,7 +111,7 @@
 		27B8813B2A1FCB16005A632F /* Training Zones */ = {
 			isa = PBXGroup;
 			children = (
-				27B8816B2A1FEED7005A632F /* BarChartView.swift */,
+				27091ABE2A6306F80013AD48 /* BarChartView.swift */,
 				27B8813E2A1FCB16005A632F /* ContentView.swift */,
 				27B881672A1FEEA8005A632F /* HealthManager.swift */,
 				275C8F652A27CD1C00EA7BE4 /* NumbersOnly.swift */,
@@ -288,9 +288,9 @@
 				27854D002A3A533E005E4B16 /* Preferences.swift in Sources */,
 				27B8813F2A1FCB16005A632F /* ContentView.swift in Sources */,
 				27B881692A1FEEA8005A632F /* HealthManager.swift in Sources */,
-				27B8816C2A1FEED7005A632F /* BarChartView.swift in Sources */,
 				275C8F5C2A202BA800EA7BE4 /* TrainingPlaceCalculator.swift in Sources */,
 				27B8816E2A1FF871005A632F /* ZonesCalculator.swift in Sources */,
+				27091ABF2A6306F80013AD48 /* BarChartView.swift in Sources */,
 				27B8816A2A1FEEA8005A632F /* ZonesVM.swift in Sources */,
 				27B8813D2A1FCB16005A632F /* Training_ZonesApp.swift in Sources */,
 			);

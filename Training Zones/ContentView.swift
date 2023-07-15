@@ -151,12 +151,13 @@ struct ContentView: View {
 						if self.zonesVM.hasHrData() {
 							VStack() {
 								let hrZonesResult = self.zonesVM.listHrZones()
-								BarChartView(bars: hrZonesResult.0, color: Color.red, units: "BPM", description: self.zonesVM.hrZonesDescription)
+								BarChartView(bars: hrZonesResult.0, color: Color.red, units: "BPM")
 									.frame(height:256)
 								Text("")
 								Text("")
 								Text("BPM")
 									.bold()
+								Text(self.zonesVM.hrZonesDescription)
 								Text("Calculated using\n" + hrZonesResult.1)
 									.multilineTextAlignment(.center)
 							}
@@ -200,12 +201,13 @@ struct ContentView: View {
 					HStack() {
 						if self.zonesVM.hasPowerData() {
 							VStack() {
-								BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts", description: self.zonesVM.powerZonesDescription)
+								BarChartView(bars: self.zonesVM.listPowerZones(), color: Color.blue, units: "Watts")
 									.frame(height:256)
 								Text("")
 								Text("")
 								Text("Watts")
 									.bold()
+								Text(self.zonesVM.powerZonesDescription)
 							}
 						}
 					}
