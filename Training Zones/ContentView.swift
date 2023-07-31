@@ -120,7 +120,7 @@ struct ContentView: View {
 							Text("years")
 						}
 						else {
-							Text("Not Set")
+							Text("Not Found")
 						}
 					}
 					HStack() {
@@ -132,7 +132,7 @@ struct ContentView: View {
 							Text("bpm")
 						}
 						else {
-							Text("Not Set")
+							Text("Not Found")
 						}
 					}
 					HStack() {
@@ -144,7 +144,7 @@ struct ContentView: View {
 							Text("bpm")
 						}
 						else {
-							Text("Not Set")
+							Text("Not Calculated")
 						}
 					}
 					HStack() {
@@ -250,7 +250,7 @@ struct ContentView: View {
 							Text(self.convertPaceToDisplayString(paceSecsPerMeter: self.healthMgr.best5KPace!))
 						}
 						else {
-							Text("Not Set")
+							Text("Not Calculated")
 						}
 					}
 					HStack() {
@@ -261,7 +261,7 @@ struct ContentView: View {
 							Text(String(format: "%.1f", self.healthMgr.best12MinuteEffort!))
 						}
 						else {
-							Text("Not Set")
+							Text("Not Calculated")
 						}
 					}
 					Spacer()

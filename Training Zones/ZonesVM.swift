@@ -76,7 +76,7 @@ class ZonesVM : ObservableObject {
 			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 
 			self.hrZonesDescription += "Zone "
-			self.hrZonesDescription += String(zoneNum)
+			self.hrZonesDescription += String(zoneNum + 1)
 			self.hrZonesDescription += " : "
 			self.hrZonesDescription += descriptions[zoneNum]
 			self.hrZonesDescription += "\n"
@@ -101,7 +101,7 @@ class ZonesVM : ObservableObject {
 			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
 
 			self.powerZonesDescription += "Zone "
-			self.powerZonesDescription += String(zoneNum)
+			self.powerZonesDescription += String(zoneNum + 1)
 			self.powerZonesDescription += " : "
 			self.powerZonesDescription += descriptions[zoneNum]
 			self.powerZonesDescription += "\n"
