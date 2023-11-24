@@ -27,6 +27,8 @@
 
 import SwiftUI
 
+let DEFAULT_INSET = EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20)
+
 struct ContentView: View {
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
@@ -158,13 +160,15 @@ struct ContentView: View {
 								Text("BPM")
 									.bold()
 								Text(self.zonesVM.hrZonesDescription)
-								Text("Calculated using\n" + hrZonesResult.1)
+								Text("Calculated Using ")
+									.bold()
+								Text(hrZonesResult.1)
 									.multilineTextAlignment(.center)
 							}
 						}
 					}
 				}
-				.padding(10)
+				.padding(DEFAULT_INSET)
 
 				// Cycling Power Zones
 				VStack(alignment: .center) {
@@ -212,12 +216,12 @@ struct ContentView: View {
 						}
 					}
 				}
-				.padding(10)
+				.padding(DEFAULT_INSET)
 				
-				// Running Paces
+				// Aerobic Performance
 				VStack(alignment: .center) {
 					HStack() {
-						Text("Running Paces")
+						Text("Aerobic Performance")
 							.bold()
 							.padding(5)
 					}
@@ -242,6 +246,7 @@ struct ContentView: View {
 							Text("Not Set")
 						}
 					}
+					.padding(.bottom, 2)
 					HStack() {
 						Text("Best Recent 5 KM (Or Greater) Effort:")
 							.bold()
@@ -253,6 +258,7 @@ struct ContentView: View {
 							Text("Not Calculated")
 						}
 					}
+					.padding(.bottom, 2)
 					HStack() {
 						Text("Best Recent 12 Minute Effort (Cooper Test):")
 							.bold()
@@ -264,20 +270,29 @@ struct ContentView: View {
 							Text("Not Calculated")
 						}
 					}
-					Spacer()
+					.padding(.bottom, 2)
+				}
+				.padding(DEFAULT_INSET)
+
+				// Run Training Paces
+				VStack(alignment: .center) {
 					HStack() {
+						Text("Run Training Paces")
+							.bold()
+							.padding(5)
+					}
+
+					VStack() {
 						let runPaces = self.zonesVM.listRunTrainingPaces()
-						VStack() {
-							ForEach([LONG_RUN_PACE_STR, EASY_RUN_PACE_STR, TEMPO_RUN_PACE_STR, FUNCTIONAL_THRESHOLD_PACE_STR], id:\.self) { paceName in
-								if runPaces[paceName] != nil {
-									HStack() {
-										Text(paceName)
-											.bold()
-										Spacer()
-										Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPaces[paceName]!))
-									}
-									.padding(.bottom, 3)
+						ForEach([LONG_RUN_PACE_STR, EASY_RUN_PACE_STR, TEMPO_RUN_PACE_STR, FUNCTIONAL_THRESHOLD_PACE_STR], id:\.self) { paceName in
+							if runPaces[paceName] != nil {
+								HStack() {
+									Text(paceName)
+										.bold()
+									Spacer()
+									Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPaces[paceName]!))
 								}
+								.padding(.bottom, 2)
 							}
 						}
 					}
@@ -300,13 +315,15 @@ struct ContentView: View {
 						}
 					}
 				}
-				.padding(10)
+				.padding(DEFAULT_INSET)
 
 				// Notes
 				HStack() {
-					Text("Note: Values are either read or estimated from HealthKit data.")
+					Text("Note: ")
+						.bold()
+					Text("Values are either read or estimated from HealthKit data.")
 				}
-				.padding(10)
+				.padding(DEFAULT_INSET)
 			}
 		}
 	}
