@@ -30,6 +30,10 @@ import SwiftUI
 let DEFAULT_INSET = EdgeInsets(top: 0, leading: 20, bottom: 5, trailing: 20)
 
 struct ContentView: View {
+	enum Field: Hashable {
+		case ftp
+	}
+
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
 	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
@@ -39,7 +43,8 @@ struct ContentView: View {
 	@State private var showingVO2MaxError: Bool = false
 	@State private var showingBest5KSecsError: Bool = false
 	@State private var units: String = Preferences.preferredUnitSystem()
-	
+	@FocusState private var focusedField: Field?
+
 	/// @brief Utility function for converting a number of seconds into HH:MMSS format
 	func formatAsHHMMSS(numSeconds: Double) -> String {
 		let SECS_PER_DAY  = 86400
@@ -194,12 +199,13 @@ struct ContentView: View {
 							.bold()
 						Spacer()
 						TextField("Watts", text: self.$ftp.value)
+							.focused(self.$focusedField, equals: .ftp)
 							.keyboardType(.decimalPad)
 							.multilineTextAlignment(.trailing)
 							.fixedSize()
 							.onChange(of: self.ftp.value) { value in
 								if let value = Double(self.ftp.value) {
-									self.zonesVM.functionalThresholdPower = value
+									self.zonesVM.healthMgr.ftp = value
 								} else {
 									self.showingFtpError = true
 								}
@@ -334,6 +340,16 @@ struct ContentView: View {
 					Text("All the values used in these calculations are either read or estimated from HealthKit data.")
 				}
 				.padding(DEFAULT_INSET)
+			}
+		}
+		.toolbar {
+			ToolbarItem(placement: .keyboard) {
+				Button("Done") {
+					if self.focusedField == .ftp {
+						self.zonesVM.healthMgr.setFtp()
+					}
+					self.focusedField = nil
+				}
 			}
 		}
 	}

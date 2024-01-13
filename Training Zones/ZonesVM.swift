@@ -37,7 +37,6 @@ let LONG_RUN_PACE_STR: String = "Long Run Pace"
 
 class ZonesVM : ObservableObject {
 	@Published var healthMgr: HealthManager = HealthManager.shared
-	@Published var functionalThresholdPower: Double?
 	var hrZonesDescription: String = ""
 	var powerZonesDescription: String = ""
 
@@ -50,7 +49,7 @@ class ZonesVM : ObservableObject {
 	}
 
 	func hasPowerData() -> Bool {
-		return self.functionalThresholdPower != nil
+		return self.healthMgr.ftp != nil
 	}
 
 	func hasRunData() -> Bool {
@@ -87,12 +86,12 @@ class ZonesVM : ObservableObject {
 	func listPowerZones() -> Array<Bar> {
 		var zoneBars: Array<Bar> = []
 
-		guard (self.functionalThresholdPower != nil) else {
+		guard (self.healthMgr.ftp != nil) else {
 			return zoneBars
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
-		let zones = calc.CalcuatePowerZones(ftp: self.functionalThresholdPower!)
+		let zones = calc.CalcuatePowerZones(ftp: self.healthMgr.ftp!)
 		let descriptions = ["Recovery", "Endurance", "Tempo", "Lactate Threshold", "VO2 Max", "Anaerobic Capacity", "Neuromuscular Power"]
 
 		self.powerZonesDescription = ""

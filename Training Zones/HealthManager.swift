@@ -37,6 +37,7 @@ class HealthManager : ObservableObject {
 	@Published var restingHr: Double?
 	@Published var maxHr: Double?
 	@Published var vo2Max: Double?
+	@Published var ftp: Double? // Cycling threshold power, in watts
 	@Published var ageInYears: Double?
 	@Published var best5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
 	@Published var best5KPace: Double? // Best 5K (or greater) effort, in pace
@@ -59,13 +60,24 @@ class HealthManager : ObservableObject {
 		let birthdayType = HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!
 		let biologicalSexType = HKObjectType.characteristicType(forIdentifier: .biologicalSex)!
 #if TARGET_OS_WATCH
-		let readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType])
+		var readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType])
+		var writeTypes: Set<HKSampleType>? = nil
 #else
 		let routeType = HKObjectType.seriesType(forIdentifier: HKWorkoutRouteTypeIdentifier)!
 		let workoutType = HKObjectType.workoutType()
-		let readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType, workoutType, routeType])
+		var readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType, workoutType, routeType])
+		var writeTypes: Set<HKSampleType>? = nil
 #endif
-		healthStore.requestAuthorization(toShare: nil, read: readTypes) { result, error in
+
+		// Have to do this down here since there's a version check.
+		if #available(iOS 17.0, *) {
+			let ftpType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
+			readTypes.insert(ftpType)
+			writeTypes = Set([ftpType])
+		}
+		
+		// Request authorization for all the things we need from HealthKit.
+		healthStore.requestAuthorization(toShare: writeTypes, read: readTypes) { result, error in
 			do {
 				try self.getAge()
 			}
@@ -74,7 +86,7 @@ class HealthManager : ObservableObject {
 			}
 			do {
 				try self.getRestingHr()
-				try self.getMaxHr()
+				try self.estimateMaxHr()
 			}
 			catch {
 				NSLog("Failed to read heart rate information from HealthKit.")
@@ -90,6 +102,12 @@ class HealthManager : ObservableObject {
 			}
 			catch {
 				NSLog("Failed to read the workout history from HealthKit.")
+			}
+			do {
+				try self.getFtp()
+			}
+			catch {
+				NSLog("Failed to read the cycling FTP from HealthKit.")
 			}
 		}
 	}
@@ -204,10 +222,10 @@ class HealthManager : ObservableObject {
 		let gregorianCalendar = NSCalendar.init(calendarIdentifier: NSCalendar.Identifier.gregorian)!
 		let tempDate = gregorianCalendar.date(from: dateOfBirth)
 
-		if tempDate != nil {
+		if let birthDate = tempDate {
 			let SECS_PER_YEAR = 365.25 * 24.0 * 60.0 * 60.0
 			DispatchQueue.main.async {
-				self.ageInYears = (Date.now.timeIntervalSince1970 - tempDate!.timeIntervalSince1970) / SECS_PER_YEAR
+				self.ageInYears = (Date.now.timeIntervalSince1970 - birthDate.timeIntervalSince1970) / SECS_PER_YEAR
 			}
 		}
 	}
@@ -217,23 +235,23 @@ class HealthManager : ObservableObject {
 		let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
 		
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
-			if sample != nil {
+			if let restingHrSample = sample {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
 				DispatchQueue.main.async {
-					self.restingHr = sample!.quantity.doubleValue(for: hrUnit)
+					self.restingHr = restingHrSample.quantity.doubleValue(for: hrUnit)
 				}
 			}
 		}
 	}
 	
 	/// @brief Estimates the user's maximum heart rate from the last six months of HealthKit data.
-	func getMaxHr() throws {
+	func estimateMaxHr() throws {
 		let hrType = HKObjectType.quantityType(forIdentifier: .heartRate)!
 		
 		self.recentQuantitySamplesOfType(quantityType: hrType) { sample, error in
-			if sample != nil {
+			if let hrSample = sample {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-				let hrValue = sample!.quantity.doubleValue(for: hrUnit)
+				let hrValue = hrSample.quantity.doubleValue(for: hrUnit)
 
 				if self.maxHr == nil || hrValue > self.maxHr! {
 					DispatchQueue.main.async {
@@ -249,14 +267,57 @@ class HealthManager : ObservableObject {
 		let vo2MaxType = HKObjectType.quantityType(forIdentifier: .vo2Max)!
 
 		self.mostRecentQuantitySampleOfType(quantityType: vo2MaxType) { sample, error in
-			if sample != nil {
+			if let vo2MaxSample = sample {
 				let kgmin = HKUnit.gramUnit(with: .kilo).unitMultiplied(by: .minute())
 				let mL = HKUnit.literUnit(with: .milli)
 				let vo2MaxUnit = mL.unitDivided(by: kgmin)
 
 				DispatchQueue.main.async {
-					self.vo2Max = sample!.quantity.doubleValue(for: vo2MaxUnit)
+					self.vo2Max = vo2MaxSample.quantity.doubleValue(for: vo2MaxUnit)
 				}
+			}
+		}
+	}
+
+	func estimateFtp() throws {
+		if #available(iOS 17.0, *) {
+			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
+			
+			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
+				if let powerSample = sample {
+					let powerUnit: HKUnit = HKUnit.watt()
+					
+					DispatchQueue.main.async {
+					}
+				}
+			}
+		}
+	}
+	
+	func getFtp() throws {
+		if #available(iOS 17.0, *) {
+			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
+			
+			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
+				if let powerSample = sample {
+					let powerUnit: HKUnit = HKUnit.watt()
+					
+					DispatchQueue.main.async {
+						self.ftp = powerSample.quantity.doubleValue(for: powerUnit)
+					}
+				}
+			}
+		}
+	}
+	
+	func setFtp() {
+		if #available(iOS 17.0, *) {
+			if let tempFtp = self.ftp {
+				let now = Date()
+				let powerQuantity = HKQuantity.init(unit: HKUnit.watt(), doubleValue: tempFtp)
+				let powerType = HKQuantityType.init(HKQuantityTypeIdentifier.cyclingFunctionalThresholdPower)
+				let powerSample = HKQuantitySample.init(type: powerType, quantity: powerQuantity, start: now, end: now)
+				self.healthStore.save(powerSample, withCompletion: {_,_ in })
 			}
 		}
 	}
