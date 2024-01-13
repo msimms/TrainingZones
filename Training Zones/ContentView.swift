@@ -102,11 +102,13 @@ struct ContentView: View {
 				VStack(alignment: .center) {
 					HStack() {
 						Text("Heart Rate Zones")
+							.font(.system(size: 24))
 							.bold()
 							.padding(5)
 					}
 					HStack() {
 						if !self.zonesVM.hasHrData() {
+							Image(systemName: "exclamationmark.circle")
 							Text("Heart rate zones are not available because your resting and maximum heart rates have not been calculated and age has not been set.")
 						}
 					}
@@ -174,11 +176,13 @@ struct ContentView: View {
 				VStack(alignment: .center) {
 					HStack() {
 						Text("Cycling Power Zones")
+							.font(.system(size: 24))
 							.bold()
 							.padding(5)
 					}
 					HStack() {
 						if !self.zonesVM.hasPowerData() {
+							Image(systemName: "exclamationmark.circle")
 							Text("Cycling power zones are not available because your FTP has not been set.")
 						}
 					}
@@ -222,12 +226,14 @@ struct ContentView: View {
 				VStack(alignment: .center) {
 					HStack() {
 						Text("Aerobic Performance")
+							.font(.system(size: 24))
 							.bold()
 							.padding(5)
 					}
 					
 					HStack() {
 						if !(self.zonesVM.hasRunData() || self.zonesVM.hasHrData()) {
+							Image(systemName: "questionmark.circle")
 							Text("To calculate run paces VO\u{00B2}Max (Cardio Fitness Score) must be calculated, or a hard run of at least 5 KM must be known.")
 						}
 					}
@@ -278,6 +284,7 @@ struct ContentView: View {
 				VStack(alignment: .center) {
 					HStack() {
 						Text("Run Training Paces")
+							.font(.system(size: 24))
 							.bold()
 							.padding(5)
 					}
@@ -296,10 +303,14 @@ struct ContentView: View {
 							}
 						}
 					}
+				}
+				.padding(DEFAULT_INSET)
 
-					// Unit selection
-					HStack() {
-						Text("Units:")
+				// Unit selection
+				VStack(alignment: .center) {
+					VStack() {
+						Text("Unit System")
+							.font(.system(size: 24))
 							.bold()
 						Spacer()
 						Button(self.units) {
@@ -319,9 +330,8 @@ struct ContentView: View {
 
 				// Notes
 				HStack() {
-					Text("Note: ")
-						.bold()
-					Text("Values are either read or estimated from HealthKit data.")
+					Image(systemName: "questionmark.circle")
+					Text("All the values used in these calculations are either read or estimated from HealthKit data.")
 				}
 				.padding(DEFAULT_INSET)
 			}
