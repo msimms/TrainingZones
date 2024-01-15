@@ -34,6 +34,7 @@ class HealthManager : ObservableObject {
 
 	private let healthStore = HKHealthStore()
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
+
 	@Published var restingHr: Double?
 	@Published var maxHr: Double?
 	@Published var vo2Max: Double?
@@ -70,7 +71,7 @@ class HealthManager : ObservableObject {
 #endif
 
 		// Have to do this down here since there's a version check.
-		if #available(iOS 17.0, *) {
+		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			let ftpType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
 			readTypes.insert(ftpType)
 			writeTypes = Set([ftpType])
@@ -188,7 +189,7 @@ class HealthManager : ObservableObject {
 
 		let datePredicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options:HKQueryOptions.strictStartDate)
 		let query = HKAnchoredObjectQuery.init(type: quantityType, predicate: datePredicate, anchor: nil, limit: HKObjectQueryNoLimit, resultsHandler: { query, addedObjects, deletedObjects, newAnchor, error in
-			
+
 			if addedObjects != nil {
 				for sample in addedObjects! {
 					if let quantitySample = sample as? HKQuantitySample {
@@ -197,7 +198,7 @@ class HealthManager : ObservableObject {
 				}
 			}
 		})
-		
+
 		query.updateHandler = { query, addedObjects, deletedObjects, newAnchor, error in
 			for sample in addedObjects! {
 				if let quantitySample = sample as? HKQuantitySample {
@@ -205,7 +206,7 @@ class HealthManager : ObservableObject {
 				}
 			}
 		}
-		
+
 		// Execute asynchronously.
 		self.healthStore.execute(query)
 
@@ -224,6 +225,7 @@ class HealthManager : ObservableObject {
 
 		if let birthDate = tempDate {
 			let SECS_PER_YEAR = 365.25 * 24.0 * 60.0 * 60.0
+
 			DispatchQueue.main.async {
 				self.ageInYears = (Date.now.timeIntervalSince1970 - birthDate.timeIntervalSince1970) / SECS_PER_YEAR
 			}
@@ -237,6 +239,7 @@ class HealthManager : ObservableObject {
 		self.mostRecentQuantitySampleOfType(quantityType: hrType) { sample, error in
 			if let restingHrSample = sample {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+
 				DispatchQueue.main.async {
 					self.restingHr = restingHrSample.quantity.doubleValue(for: hrUnit)
 				}
@@ -280,9 +283,9 @@ class HealthManager : ObservableObject {
 	}
 
 	func estimateFtp() throws {
-		if #available(iOS 17.0, *) {
-			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
-			
+		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
+			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
+
 			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
 				if let powerSample = sample {
 					let powerUnit: HKUnit = HKUnit.watt()
@@ -295,7 +298,7 @@ class HealthManager : ObservableObject {
 	}
 	
 	func getFtp() throws {
-		if #available(iOS 17.0, *) {
+		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
 			
 			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
@@ -311,12 +314,13 @@ class HealthManager : ObservableObject {
 	}
 	
 	func setFtp() {
-		if #available(iOS 17.0, *) {
+		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			if let tempFtp = self.ftp {
 				let now = Date()
 				let powerQuantity = HKQuantity.init(unit: HKUnit.watt(), doubleValue: tempFtp)
 				let powerType = HKQuantityType.init(HKQuantityTypeIdentifier.cyclingFunctionalThresholdPower)
 				let powerSample = HKQuantitySample.init(type: powerType, quantity: powerQuantity, start: now, end: now)
+
 				self.healthStore.save(powerSample, withCompletion: {_,_ in })
 			}
 		}

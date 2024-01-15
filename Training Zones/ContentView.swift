@@ -200,7 +200,9 @@ struct ContentView: View {
 						Spacer()
 						TextField("Watts", text: self.$ftp.value)
 							.focused(self.$focusedField, equals: .ftp)
+#if TARGET_OS_IOS || TARGET_OS_WATCHOS
 							.keyboardType(.decimalPad)
+#endif
 							.multilineTextAlignment(.trailing)
 							.fixedSize()
 							.onChange(of: self.ftp.value) { value in
