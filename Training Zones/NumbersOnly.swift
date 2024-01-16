@@ -33,8 +33,8 @@ class NumbersOnly: ObservableObject {
 		didSet {
 			let filtered = value.filter { $0.isNumber || $0 == "." }
 
-			if value != filtered {
-				value = filtered
+			if self.value != filtered {
+				self.value = filtered
 			}
 		}
 	}

@@ -36,7 +36,6 @@ struct ContentView: View {
 
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
-	@ObservedObject var ftp = NumbersOnly(initialDoubleValue: 0.0)
 	@State private var showingHrAlgorithmSelection: Bool = false
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
@@ -188,7 +187,7 @@ struct ContentView: View {
 					HStack() {
 						if !self.zonesVM.hasPowerData() {
 							Image(systemName: "exclamationmark.circle")
-							Text("Cycling power zones are not available because your FTP has not been set.")
+							Text("Cycling power zones were not calculated because your FTP has not been set.")
 						}
 					}
 					
@@ -198,20 +197,19 @@ struct ContentView: View {
 						Text("Functional Threshold Power: ")
 							.bold()
 						Spacer()
-						TextField("Watts", text: self.$ftp.value)
+						TextField("Not set", text: Binding(
+							get: { self.healthMgr.ftp == nil ? "" : String(self.healthMgr.ftp!) },
+							set: {(newValue) in
+								if let newFtp = Double(newValue) {
+									self.zonesVM.healthMgr.ftp = newFtp
+								}
+							}))
 							.focused(self.$focusedField, equals: .ftp)
 #if TARGET_OS_IOS || TARGET_OS_WATCHOS
 							.keyboardType(.decimalPad)
 #endif
 							.multilineTextAlignment(.trailing)
 							.fixedSize()
-							.onChange(of: self.ftp.value) { value in
-								if let value = Double(self.ftp.value) {
-									self.zonesVM.healthMgr.ftp = value
-								} else {
-									self.showingFtpError = true
-								}
-							}
 						Text("watts")
 					}
 					HStack() {
