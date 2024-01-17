@@ -68,6 +68,7 @@ class ZonesVM : ObservableObject {
 		let zoneMaxValues = hrZonesResult.0
 		let algorithmName = hrZonesResult.1
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
+		var lastValue = 1.0
 
 		self.hrZonesDescription = ""
 		for zoneNum in 0...4 {
@@ -79,6 +80,8 @@ class ZonesVM : ObservableObject {
 			self.hrZonesDescription += " : "
 			self.hrZonesDescription += descriptions[zoneNum]
 			self.hrZonesDescription += "\n"
+			
+			lastValue = zoneValue
 		}
 		return (zoneBars, algorithmName)
 	}
@@ -93,17 +96,22 @@ class ZonesVM : ObservableObject {
 		let calc: ZonesCalculator = ZonesCalculator()
 		let zones = calc.CalcuatePowerZones(ftp: self.healthMgr.ftp!)
 		let descriptions = ["Recovery", "Endurance", "Tempo", "Lactate Threshold", "VO2 Max", "Anaerobic Capacity", "Neuromuscular Power"]
+		var lastValue = 1
 
 		self.powerZonesDescription = ""
 		for zoneNum in 0...4 {
+			let printableValue = Int(zones[zoneNum])
 			let zoneValue = zones[zoneNum]
-			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+			let zoneLabel = "\(lastValue) to \(printableValue)"
+			zoneBars.append(Bar(value: zoneValue, label: zoneLabel, description: descriptions[zoneNum]))
 
 			self.powerZonesDescription += "Zone "
 			self.powerZonesDescription += String(zoneNum + 1)
 			self.powerZonesDescription += " : "
 			self.powerZonesDescription += descriptions[zoneNum]
 			self.powerZonesDescription += "\n"
+
+			lastValue = printableValue
 		}
 		return zoneBars
 	}
