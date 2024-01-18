@@ -72,8 +72,10 @@ class ZonesVM : ObservableObject {
 
 		self.hrZonesDescription = ""
 		for zoneNum in 0...4 {
+			let printableValue = Int(zoneMaxValues[zoneNum])
 			let zoneValue = zoneMaxValues[zoneNum]
-			zoneBars.append(Bar(value: zoneValue, label: String(Int(zoneValue)), description: descriptions[zoneNum]))
+			let zoneLabel = "\(lastValue) to \(printableValue)"
+			zoneBars.append(Bar(value: zoneValue, label: zoneLabel, description: descriptions[zoneNum]))
 
 			self.hrZonesDescription += "Zone "
 			self.hrZonesDescription += String(zoneNum + 1)
@@ -99,7 +101,7 @@ class ZonesVM : ObservableObject {
 		var lastValue = 1
 
 		self.powerZonesDescription = ""
-		for zoneNum in 0...4 {
+		for zoneNum in 0...5 {
 			let printableValue = Int(zones[zoneNum])
 			let zoneValue = zones[zoneNum]
 			let zoneLabel = "\(lastValue) to \(printableValue)"

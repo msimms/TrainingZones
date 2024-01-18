@@ -81,7 +81,8 @@ class ZonesCalculator {
 	func CalcuatePowerZones(ftp: Double) -> [Double] {
 		var zones = Array(repeating: 0.0, count: NUM_POWER_ZONES)
 		
-		// Dr. Andy Coggan 6 zone model, last zone is anything over
+		// Dr. Andy Coggan 7 zone model, Zone 6 is anything over 120%,
+		// Zone 7 is neuromuscular (i.e., shorts sprints at no specific power)
 		zones[0] = ftp * 0.55
 		zones[1] = ftp * 0.75
 		zones[2] = ftp * 0.90
