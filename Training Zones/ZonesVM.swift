@@ -68,13 +68,13 @@ class ZonesVM : ObservableObject {
 		let zoneMaxValues = hrZonesResult.0
 		let algorithmName = hrZonesResult.1
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
-		var lastValue = 1.0
+		var lastValue = 1
 
 		self.hrZonesDescription = ""
 		for zoneNum in 0...4 {
 			let printableValue = Int(zoneMaxValues[zoneNum])
 			let zoneValue = zoneMaxValues[zoneNum]
-			let zoneLabel = "\(lastValue) to \(printableValue)"
+			let zoneLabel = "\(lastValue) to \(printableValue) BPM"
 			zoneBars.append(Bar(value: zoneValue, label: zoneLabel, description: descriptions[zoneNum]))
 
 			self.hrZonesDescription += "Zone "
@@ -83,7 +83,7 @@ class ZonesVM : ObservableObject {
 			self.hrZonesDescription += descriptions[zoneNum]
 			self.hrZonesDescription += "\n"
 			
-			lastValue = zoneValue
+			lastValue = printableValue
 		}
 		return (zoneBars, algorithmName)
 	}
@@ -104,7 +104,7 @@ class ZonesVM : ObservableObject {
 		for zoneNum in 0...5 {
 			let printableValue = Int(zones[zoneNum])
 			let zoneValue = zones[zoneNum]
-			let zoneLabel = "\(lastValue) to \(printableValue)"
+			let zoneLabel = "\(lastValue) to \(printableValue) Watts"
 			zoneBars.append(Bar(value: zoneValue, label: zoneLabel, description: descriptions[zoneNum]))
 
 			self.powerZonesDescription += "Zone "
