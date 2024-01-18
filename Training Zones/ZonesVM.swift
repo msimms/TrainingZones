@@ -64,7 +64,7 @@ class ZonesVM : ObservableObject {
 		}
 
 		let calc: ZonesCalculator = ZonesCalculator()
-		let hrZonesResult = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.maxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
+		let hrZonesResult = calc.CalculateHeartRateZones(restingHr: self.healthMgr.restingHr ?? 0.0, maxHr: self.healthMgr.estimatedMaxHr ?? 0.0, ageInYears: self.healthMgr.ageInYears!)
 		let zoneMaxValues = hrZonesResult.0
 		let algorithmName = hrZonesResult.1
 		let descriptions = ["Very Light (Recovery)", "Light (Endurance)", "Moderate", "Hard (Speed Endurance)", "Maximum"]
@@ -118,24 +118,30 @@ class ZonesVM : ObservableObject {
 		return zoneBars
 	}
 
-	func listRunTrainingPaces() -> Dictionary<String, Double> {
+	func listRunTrainingPaces() -> (Dictionary<String, Double>, String) {
 		var result: Dictionary<String, Double> = [:]
+		var algorithmName = ""
 		
-		if self.healthMgr.vo2Max != nil || self.healthMgr.best5KDuration != nil || (self.healthMgr.restingHr != nil && self.healthMgr.maxHr != nil) {
+		if self.healthMgr.vo2Max != nil || self.healthMgr.best5KDuration != nil || (self.healthMgr.restingHr != nil && self.healthMgr.estimatedMaxHr != nil) {
 			let calc: ZonesCalculator = ZonesCalculator()
 			let restingHr = self.healthMgr.restingHr ?? 0.0
-			let maxHr = self.healthMgr.maxHr ?? 0.0
+			let maxHr = self.healthMgr.estimatedMaxHr ?? 0.0
 			let vo2Max = self.healthMgr.vo2Max ?? 0.0
 			let best5KSecs = self.healthMgr.best5KDuration ?? 0
 			let cooperTestMeters = self.healthMgr.best12MinuteEffort ?? 0
 			let ageInYears = self.healthMgr.ageInYears ?? 0.0
+			let paces = calc.CalculateRunTrainingPaces(vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
 			
-			result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[EASY_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[MARATHON_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[TEMPO_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
-			result[FUNCTIONAL_THRESHOLD_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, vo2Max: vo2Max, best5KSecs: best5KSecs, cooperTestMeters: cooperTestMeters, restingHr: restingHr, maxHr: maxHr, ageInYears: ageInYears)
+			if !paces.0.isEmpty {
+				result[LONG_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.LONG_RUN_PACE, paces: paces.0)
+				result[EASY_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.EASY_RUN_PACE, paces: paces.0)
+				result[MARATHON_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.MARATHON_PACE, paces: paces.0)
+				result[TEMPO_RUN_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.TEMPO_RUN_PACE, paces: paces.0)
+				result[FUNCTIONAL_THRESHOLD_PACE_STR] = calc.GetRunTrainingPace(zone: TrainingPaceType.FUNCTIONAL_THRESHOLD_PACE, paces: paces.0)
+				
+				algorithmName = paces.1
+			}
 		}
-		return result
+		return (result, algorithmName)
 	}
 }

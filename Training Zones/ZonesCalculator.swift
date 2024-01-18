@@ -34,6 +34,11 @@ let HR_ALGORITHM_NAME_AGE = "Estimated Maximum Heart Rate"
 let HR_ALGORITHM_NAME_MAX_HR = "Actual Maximum Heart Rate"
 let HR_ALGORITHM_NAME_HR_RESERVE = "Heart Rate Reserve (Karvonen Formula)"
 
+let RUN_PACE_ALGORITHM_NAME_COOPER_TEST = "Cooper Test"
+let RUN_PACE_ALGORITHM_NAME_BEST_5K = "Best Recent 5K"
+let RUN_PACE_ALGORITHM_NAME_HR = "Heart Rate"
+let RUN_PACE_ALGORITHM_NAME_VO2_MAX = "VO2 Max"
+
 class ZonesCalculator {
 	func EstimateMaxHrFromAge(ageInYears: Double) -> Double {
 		// Use the Oakland nonlinear formula to estimate based on age.
@@ -92,30 +97,40 @@ class ZonesCalculator {
 		return zones
 	}
 
-	func GetRunTrainingPace(zone: TrainingPaceType, vo2Max: Double, best5KSecs: Double, cooperTestMeters: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> Double {
+	func CalculateRunTrainingPaces(vo2Max: Double, best5KSecs: Double, cooperTestMeters: Double, restingHr: Double, maxHr: Double, ageInYears: Double) -> ([TrainingPaceType:Double], String) {
 		let paceCalc: TrainingPlaceCalculator = TrainingPlaceCalculator()
 		var paces: Dictionary<TrainingPaceType, Double> = [:]
+		var algorithmName: String = ""
 
-		// Preferred method: VO2Max
-		if vo2Max > 0.0 {
-			paces = paceCalc.CalcFromVO2Max(vo2max: vo2Max)
-		}
-		
-		// Next choice: Cooper Test.
-		else if cooperTestMeters > 100.0 {
+		// First choice: Cooper Test.
+		if cooperTestMeters > 100.0 {
 			paces = paceCalc.CalcFromUsingCooperTest(cooperTestMeters: cooperTestMeters)
+			algorithmName = RUN_PACE_ALGORITHM_NAME_COOPER_TEST
 		}
-		
+
 		// Next choice: results of a recent hard effort.
 		else if best5KSecs > 600.0 {
 			paces = paceCalc.CalcFromRaceDistanceInMeters(raceDurationSecs: best5KSecs, raceDistanceMeters: 5000.0)
+			algorithmName = RUN_PACE_ALGORITHM_NAME_BEST_5K
 		}
 		
 		// Next choice: from heart rate.
 		else if restingHr > 1.0 && maxHr > 1.0 {
 			paces = paceCalc.CalcFromHR(restingHr: restingHr, maxHr: maxHr)
+			algorithmName = RUN_PACE_ALGORITHM_NAME_HR
 		}
+		
+		// Next method: VO2Max
+		// This is only last because watch VO2Max can be kinda bad.
+		else if vo2Max > 0.0 {
+			paces = paceCalc.CalcFromVO2Max(vo2max: vo2Max)
+			algorithmName = RUN_PACE_ALGORITHM_NAME_VO2_MAX
+		}
+		
+		return (paces, algorithmName)
+	}
 
+	func GetRunTrainingPace(zone: TrainingPaceType, paces: [TrainingPaceType:Double] ) -> Double {
 		if let result = paces[zone] {
 			return result
 		}

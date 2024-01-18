@@ -34,11 +34,13 @@ class HealthManager : ObservableObject {
 
 	private let healthStore = HKHealthStore()
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
+	private var powerSampleBuf: [HKQuantitySample] = []
 
-	@Published var restingHr: Double?
-	@Published var maxHr: Double?
-	@Published var vo2Max: Double?
-	@Published var ftp: Double? // Cycling threshold power, in watts
+	@Published var restingHr: Double? // Resting heart rate, from HealthKit
+	@Published var estimatedMaxHr: Double? // Algorithmically estimated maximum heart rate
+	@Published var vo2Max: Double? // VO2Max, from HealthKit
+	@Published var ftp: Double? // Cycling threshold power, from HealthKit, in watts
+	@Published var estimatedFtp: Double? // Algorithmically estimated cycling threshold power, in watts
 	@Published var ageInYears: Double?
 	@Published var best5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
 	@Published var best5KPace: Double? // Best 5K (or greater) effort, in pace
@@ -256,9 +258,9 @@ class HealthManager : ObservableObject {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
 				let hrValue = hrSample.quantity.doubleValue(for: hrUnit)
 
-				if self.maxHr == nil || hrValue > self.maxHr! {
+				if self.estimatedMaxHr == nil || hrValue > self.estimatedMaxHr! {
 					DispatchQueue.main.async {
-						self.maxHr = hrValue
+						self.estimatedMaxHr = hrValue
 					}
 				}
 			}
@@ -289,8 +291,17 @@ class HealthManager : ObservableObject {
 			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
 				if let powerSample = sample {
 					let powerUnit: HKUnit = HKUnit.watt()
+
+					// Add to the sample buffer.
+					self.powerSampleBuf.append(powerSample)
+
+					// Remove anything that falls outside of our 20 minute window.
 					
-					DispatchQueue.main.async {
+					// Compute the average.
+
+					if self.estimatedFtp == nil {
+						DispatchQueue.main.async {
+						}
 					}
 				}
 			}

@@ -144,11 +144,11 @@ struct ContentView: View {
 						}
 					}
 					HStack() {
-						Text("Maximum Heart Rate:")
+						Text("Estimated Maximum Heart Rate:")
 							.bold()
 						Spacer()
-						if self.healthMgr.maxHr != nil {
-							Text(String(self.healthMgr.maxHr!))
+						if self.healthMgr.estimatedMaxHr != nil {
+							Text(String(self.healthMgr.estimatedMaxHr!))
 							Text("bpm")
 						}
 						else {
@@ -296,18 +296,22 @@ struct ContentView: View {
 					}
 
 					VStack() {
-						let runPaces = self.zonesVM.listRunTrainingPaces()
+						let runPacesResult = self.zonesVM.listRunTrainingPaces()
 						ForEach([LONG_RUN_PACE_STR, EASY_RUN_PACE_STR, TEMPO_RUN_PACE_STR, FUNCTIONAL_THRESHOLD_PACE_STR], id:\.self) { paceName in
-							if runPaces[paceName] != nil {
+							if runPacesResult.0[paceName] != nil {
 								HStack() {
 									Text(paceName)
 										.bold()
 									Spacer()
-									Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPaces[paceName]!))
+									Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPacesResult.0[paceName]!))
 								}
 								.padding(.bottom, 2)
 							}
 						}
+						Text("Calculated Using ")
+							.bold()
+						Text(runPacesResult.1)
+							.multilineTextAlignment(.center)
 					}
 				}
 				.padding(DEFAULT_INSET)
