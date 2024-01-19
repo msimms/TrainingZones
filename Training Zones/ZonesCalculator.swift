@@ -93,7 +93,7 @@ class ZonesCalculator {
 		zones[2] = ftp * 0.90
 		zones[3] = ftp * 1.05
 		zones[4] = ftp * 1.20
-		zones[5] = ftp * 2.00
+		zones[5] = ftp * 1.50
 		return zones
 	}
 

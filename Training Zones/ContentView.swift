@@ -148,7 +148,7 @@ struct ContentView: View {
 							.bold()
 						Spacer()
 						if self.healthMgr.estimatedMaxHr != nil {
-							Text(String(self.healthMgr.estimatedMaxHr!))
+							Text(String(Int(self.healthMgr.estimatedMaxHr!)))
 							Text("bpm")
 						}
 						else {

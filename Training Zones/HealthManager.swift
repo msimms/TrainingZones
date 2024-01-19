@@ -34,6 +34,7 @@ class HealthManager : ObservableObject {
 
 	private let healthStore = HKHealthStore()
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
+	private var hrSampleBuf: [Double] = []
 	private var powerSampleBuf: [HKQuantitySample] = []
 
 	@Published var restingHr: Double? // Resting heart rate, from HealthKit
@@ -257,10 +258,24 @@ class HealthManager : ObservableObject {
 			if let hrSample = sample {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
 				let hrValue = hrSample.quantity.doubleValue(for: hrUnit)
+				
+				// In an attempt to filter out bad data, take the average of the
+				// highest HR readings.
+				let MAX_BUF_SIZE = 64
+				if self.hrSampleBuf.count == 0 || hrValue > self.hrSampleBuf[0] {
+					self.hrSampleBuf.append(hrValue)
+					self.hrSampleBuf.sort()
+					if self.hrSampleBuf.count > MAX_BUF_SIZE {
+						self.hrSampleBuf.remove(at: 0)
+					}
 
-				if self.estimatedMaxHr == nil || hrValue > self.estimatedMaxHr! {
-					DispatchQueue.main.async {
-						self.estimatedMaxHr = hrValue
+					let bufSum = self.hrSampleBuf.reduce(0, +)
+					let bufAvg = bufSum / Double(self.hrSampleBuf.count)
+					
+					if self.estimatedMaxHr == nil || bufAvg > self.estimatedMaxHr! {
+						DispatchQueue.main.async {
+							self.estimatedMaxHr = bufAvg
+						}
 					}
 				}
 			}

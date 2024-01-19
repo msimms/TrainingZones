@@ -104,7 +104,14 @@ class ZonesVM : ObservableObject {
 		for zoneNum in 0...5 {
 			let printableValue = Int(zones[zoneNum])
 			let zoneValue = zones[zoneNum]
-			let zoneLabel = "\(lastValue) to \(printableValue) Watts"
+			var zoneLabel = ""
+
+			if zoneNum == 5 {
+				zoneLabel = "> \(lastValue) Watts"
+			}
+			else {
+				zoneLabel = "\(lastValue) to \(printableValue) Watts"
+			}
 			zoneBars.append(Bar(value: zoneValue, label: zoneLabel, description: descriptions[zoneNum]))
 
 			self.powerZonesDescription += "Zone "
