@@ -125,10 +125,13 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.ageInYears != nil {
 							Text(String(format: "%.2f", self.healthMgr.ageInYears!))
+								.font(.system(.body, design: .monospaced))
 							Text("years")
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Found")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					HStack() {
@@ -137,10 +140,13 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.restingHr != nil {
 							Text(String(self.healthMgr.restingHr!))
+								.font(.system(.body, design: .monospaced))
 							Text("bpm")
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Found")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					HStack() {
@@ -149,10 +155,13 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.estimatedMaxHr != nil {
 							Text(String(Int(self.healthMgr.estimatedMaxHr!)))
+								.font(.system(.body, design: .monospaced))
 							Text("bpm")
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Calculated")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					HStack() {
@@ -208,9 +217,11 @@ struct ContentView: View {
 #if TARGET_OS_IOS || TARGET_OS_WATCHOS
 							.keyboardType(.decimalPad)
 #endif
+							.font(.system(.body, design: .monospaced))
 							.multilineTextAlignment(.trailing)
 							.fixedSize()
 						Text("watts")
+							.font(.system(.body, design: .monospaced))
 					}
 					HStack() {
 						if self.zonesVM.hasPowerData() {
@@ -252,10 +263,13 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.vo2Max != nil {
 							Text(String(self.healthMgr.vo2Max!))
+								.font(.system(.body, design: .monospaced))
 							Text("ml/kg/min")
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Set")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					.padding(.bottom, 2)
@@ -265,9 +279,11 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.best5KPace != nil {
 							Text(self.convertPaceToDisplayString(paceSecsPerMeter: self.healthMgr.best5KPace!))
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Calculated")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					.padding(.bottom, 2)
@@ -277,9 +293,11 @@ struct ContentView: View {
 						Spacer()
 						if self.healthMgr.best12MinuteEffort != nil {
 							Text(String(format: "%.1f", self.healthMgr.best12MinuteEffort!))
+								.font(.system(.body, design: .monospaced))
 						}
 						else {
 							Text("Not Calculated")
+								.font(.system(.body, design: .monospaced))
 						}
 					}
 					.padding(.bottom, 2)
@@ -304,6 +322,7 @@ struct ContentView: View {
 										.bold()
 									Spacer()
 									Text(self.convertSpeedToPaceDisplayString(speedMetersPerMin: runPacesResult.0[paceName]!))
+										.font(.system(.body, design: .monospaced))
 								}
 								.padding(.bottom, 2)
 							}
