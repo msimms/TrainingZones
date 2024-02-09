@@ -34,7 +34,9 @@ class HealthManager : ObservableObject {
 
 	private let healthStore = HKHealthStore()
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
-	private var hrSampleBuf: [Double] = []
+	private var hrTopSampleBuf: [Double] = []
+	private var hrSum: Double = 0.0
+	private var totalHrSamples: UInt64 = 0
 	private var powerSampleBuf: [HKQuantitySample] = []
 
 	@Published var restingHr: Double? // Resting heart rate, from HealthKit
@@ -259,19 +261,29 @@ class HealthManager : ObservableObject {
 				let hrUnit: HKUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
 				let hrValue = hrSample.quantity.doubleValue(for: hrUnit)
 				
-				// In an attempt to filter out bad data, take the average of the
+				self.hrSum += hrValue
+				self.totalHrSamples += 1
+				
+				// Filtering out bad data, part 1: Apply the sigmoid squishification
+				// function to each reading, based on their offset from the mean.
+				let mean = self.hrSum / Double(self.totalHrSamples)
+				let offset = hrValue - mean
+				let sig = 1.0 / (1.0 + exp(-offset))
+				let squishedValue = hrValue * sig
+
+				// Filtering out bad data, part 2: Take the average of the
 				// highest HR readings.
 				let MAX_BUF_SIZE = 64
-				if self.hrSampleBuf.count == 0 || hrValue > self.hrSampleBuf[0] {
-					self.hrSampleBuf.append(hrValue)
-					self.hrSampleBuf.sort()
-					if self.hrSampleBuf.count > MAX_BUF_SIZE {
-						self.hrSampleBuf.remove(at: 0)
+				if self.hrTopSampleBuf.count == 0 || squishedValue > self.hrTopSampleBuf[0] {
+					self.hrTopSampleBuf.append(hrValue)
+					self.hrTopSampleBuf.sort()
+					if self.hrTopSampleBuf.count > MAX_BUF_SIZE {
+						self.hrTopSampleBuf.remove(at: 0)
 					}
-
-					let bufSum = self.hrSampleBuf.reduce(0, +)
-					let bufAvg = bufSum / Double(self.hrSampleBuf.count)
 					
+					let bufSum = self.hrTopSampleBuf.reduce(0, +)
+					let bufAvg = bufSum / Double(self.hrTopSampleBuf.count)
+
 					if self.estimatedMaxHr == nil || bufAvg > self.estimatedMaxHr! {
 						DispatchQueue.main.async {
 							self.estimatedMaxHr = bufAvg
