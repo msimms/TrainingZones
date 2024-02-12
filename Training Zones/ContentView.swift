@@ -224,6 +224,17 @@ struct ContentView: View {
 						Text("watts")
 							.font(.system(.body, design: .monospaced))
 					}
+					if self.healthMgr.estimatedFtp != nil {
+						HStack() {
+							Text("FTP (Estimated From HealthKit Power Data): ")
+								.bold()
+							Spacer()
+							Text(String(Int(self.healthMgr.estimatedFtp!)))
+								.font(.system(.body, design: .monospaced))
+							Text("watts")
+								.font(.system(.body, design: .monospaced))
+						}
+					}
 					HStack() {
 						if self.zonesVM.hasPowerData() {
 							VStack() {

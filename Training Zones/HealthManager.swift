@@ -34,6 +34,7 @@ class HealthManager : ObservableObject {
 
 	private let healthStore = HKHealthStore()
 	private var queryGroup: DispatchGroup = DispatchGroup() // tracks queries until they are completed
+
 	private var hrTopSampleBuf: [Double] = []
 	private var hrSum: Double = 0.0
 	private var totalHrSamples: UInt64 = 0
@@ -77,7 +78,10 @@ class HealthManager : ObservableObject {
 
 		// Have to do this down here since there's a version check.
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
+			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
 			let ftpType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
+
+			readTypes.insert(powerType)
 			readTypes.insert(ftpType)
 			writeTypes = Set([ftpType])
 		}
@@ -111,9 +115,10 @@ class HealthManager : ObservableObject {
 			}
 			do {
 				try self.getFtp()
+				try self.estimateFtp()
 			}
 			catch {
-				NSLog("Failed to read the cycling FTP from HealthKit.")
+				NSLog("Failed to read cycling power or the FTP from HealthKit.")
 			}
 		}
 	}
@@ -145,7 +150,8 @@ class HealthManager : ObservableObject {
 		
 		let oneYear = (365.25 * 24.0 * 60.0 * 60.0)
 		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - oneYear)
-		let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: [.strictStartDate])
+		let endDate = Date()
+		let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: [.strictStartDate])
 
 		let query = HKSampleQuery.init(sampleType: quantityType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil, resultsHandler: { query, results, error in
 			
@@ -313,21 +319,41 @@ class HealthManager : ObservableObject {
 
 	func estimateFtp() throws {
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
-			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
+			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
 
-			self.mostRecentQuantitySampleOfType(quantityType: powerType) { sample, error in
+			self.recentQuantitySamplesOfType(quantityType: powerType) { sample, error in
 				if let powerSample = sample {
 					let powerUnit: HKUnit = HKUnit.watt()
 
 					// Add to the sample buffer.
 					self.powerSampleBuf.append(powerSample)
+					if self.powerSampleBuf.count > 1 {
+						
+						// Remove anything that falls outside of our 20 minute window.
+						var startTime = self.powerSampleBuf[0].startDate
+						let endTime = powerSample.endDate
+						while endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (20 * 60) && self.powerSampleBuf.count > 1{
+							self.powerSampleBuf.removeFirst()
+							startTime = self.powerSampleBuf[0].startDate
+						}
+						
+						// Make sure we didn't empty the buffer when purging old data.
+						// Also make sure we have something close to 20 mimutes of data.
+						if endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (19.5 * 60) && self.powerSampleBuf.count > 1 {
 
-					// Remove anything that falls outside of our 20 minute window.
-					
-					// Compute the average.
-
-					if self.estimatedFtp == nil {
-						DispatchQueue.main.async {
+							// Compute the average.
+							var sum: Double = 0.0
+							for bufSample in self.powerSampleBuf {
+								sum += bufSample.quantity.doubleValue(for: powerUnit)
+							}
+							let avg = sum / Double(self.powerSampleBuf.count)
+							let estimate = avg * 0.95
+							
+							if self.estimatedFtp == nil || estimate > self.estimatedFtp! {
+								DispatchQueue.main.async {
+									self.estimatedFtp = estimate
+								}
+							}
 						}
 					}
 				}
