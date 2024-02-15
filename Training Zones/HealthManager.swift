@@ -38,7 +38,7 @@ class HealthManager : ObservableObject {
 	private var hrTopSampleBuf: [Double] = []
 	private var hrSum: Double = 0.0
 	private var totalHrSamples: UInt64 = 0
-	private var powerSampleBuf: [HKQuantitySample] = []
+	private var powerSampleBuf: [HKQuantitySample] = [] // Used when estimating the user's FTP from cycling power samples in HealthKit
 
 	@Published var restingHr: Double? // Resting heart rate, from HealthKit
 	@Published var estimatedMaxHr: Double? // Algorithmically estimated maximum heart rate
@@ -317,9 +317,11 @@ class HealthManager : ObservableObject {
 		}
 	}
 
+	/// @brief Estimates the user's cycling FTP based on cycling power data in HealthKit. Uses 95% of the best recent 20 minute effort.
 	func estimateFtp() throws {
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
+			self.powerSampleBuf.removeAll()
 
 			self.recentQuantitySamplesOfType(quantityType: powerType) { sample, error in
 				if let powerSample = sample {
