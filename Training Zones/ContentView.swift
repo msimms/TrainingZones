@@ -215,7 +215,7 @@ struct ContentView: View {
 								}
 							}))
 							.focused(self.$focusedField, equals: .ftp)
-#if TARGET_OS_IOS || TARGET_OS_WATCHOS
+#if os(iOS) || os(watchOS)
 							.keyboardType(.decimalPad)
 #endif
 							.font(.system(.body, design: .monospaced))
