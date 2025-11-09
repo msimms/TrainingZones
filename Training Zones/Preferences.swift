@@ -27,8 +27,8 @@
 
 import Foundation
 
-let PREF_NAME_UNITS =    "Units"
-let PREF_NAME_METRIC =   "Metric"
+let PREF_NAME_UNITS    = "Units"
+let PREF_NAME_METRIC   = "Metric"
 let PREF_NAME_IMPERIAL = "Imperial"
 
 class Preferences {

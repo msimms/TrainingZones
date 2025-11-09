@@ -27,13 +27,13 @@
 
 import Foundation
 
-let SPEED_RUN_PACE_STR: String = "Speed Session Pace" // Pace for medium distance interfals
-let SHORT_INTERVAL_RUN_PACE_STR: String = "Short Interval Run Pace" // Pace for shorter track intervals
+let SPEED_RUN_PACE_STR: String            = "Speed Session Pace"        // Pace for medium distance interfals
+let SHORT_INTERVAL_RUN_PACE_STR: String   = "Short Interval Run Pace"   // Pace for shorter track intervals
 let FUNCTIONAL_THRESHOLD_PACE_STR: String = "Functional Threshold Pace" // Pace that could be held for one hour, max effort
-let TEMPO_RUN_PACE_STR: String = "Tempo Run Pace"
-let MARATHON_PACE_STR: String = "Marathon Pace"
-let EASY_RUN_PACE_STR: String = "Easy Run Pace"
-let LONG_RUN_PACE_STR: String = "Long Run Pace"
+let TEMPO_RUN_PACE_STR: String            = "Tempo Run Pace"
+let MARATHON_PACE_STR: String             = "Marathon Pace"
+let EASY_RUN_PACE_STR: String             = "Easy Run Pace"
+let LONG_RUN_PACE_STR: String             = "Long Run Pace"
 
 class ZonesVM : ObservableObject {
 	@Published var healthMgr: HealthManager = HealthManager.shared

@@ -27,17 +27,17 @@
 
 import Foundation
 
-let NUM_HR_ZONES = 5
+let NUM_HR_ZONES    = 5
 let NUM_POWER_ZONES = 6
 
-let HR_ALGORITHM_NAME_AGE = "Estimated Maximum Heart Rate"
-let HR_ALGORITHM_NAME_MAX_HR = "Actual Maximum Heart Rate"
+let HR_ALGORITHM_NAME_AGE        = "Estimated Maximum Heart Rate"
+let HR_ALGORITHM_NAME_MAX_HR     = "Actual Maximum Heart Rate"
 let HR_ALGORITHM_NAME_HR_RESERVE = "Heart Rate Reserve (Karvonen Formula)"
 
 let RUN_PACE_ALGORITHM_NAME_COOPER_TEST = "Cooper Test"
-let RUN_PACE_ALGORITHM_NAME_BEST_5K = "Best Recent 5K"
-let RUN_PACE_ALGORITHM_NAME_HR = "Heart Rate"
-let RUN_PACE_ALGORITHM_NAME_VO2_MAX = "VO2 Max"
+let RUN_PACE_ALGORITHM_NAME_BEST_5K     = "Best Recent 5K"
+let RUN_PACE_ALGORITHM_NAME_HR          = "Heart Rate"
+let RUN_PACE_ALGORITHM_NAME_VO2_MAX     = "VO2 Max"
 
 class ZonesCalculator {
 	func EstimateMaxHrFromAge(ageInYears: Double) -> Double {
