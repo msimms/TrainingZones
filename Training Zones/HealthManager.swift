@@ -66,7 +66,7 @@ class HealthManager : ObservableObject {
 		let vo2MaxType = HKObjectType.quantityType(forIdentifier: .vo2Max)!
 		let birthdayType = HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!
 		let biologicalSexType = HKObjectType.characteristicType(forIdentifier: .biologicalSex)!
-#if TARGET_OS_WATCH
+#if os(watchOS)
 		var readTypes = Set([heartRateType, restingHeartRateType, vo2MaxType, birthdayType, biologicalSexType])
 		var writeTypes: Set<HKSampleType>? = nil
 #else
