@@ -38,7 +38,8 @@ class HealthManager : ObservableObject {
 	private var hrTopSampleBuf: [Double] = []
 	private var hrSum: Double = 0.0
 	private var totalHrSamples: UInt64 = 0
-	private var powerSampleBuf: [HKQuantitySample] = [] // Used when estimating the user's FTP from cycling power samples in HealthKit
+	private var powerSampleBuf20Min: [HKQuantitySample] = [] // Used when estimating the user's FTP from cycling power samples in HealthKit (last 20 minutes)
+	private var powerSampleBuf8Min: [HKQuantitySample] = [] // Used when estimating the user's FTP from cycling power samples in HealthKit (last 8 minutes)
 
 	@Published var restingHr: Double? // Resting heart rate, from HealthKit
 	@Published var estimatedMaxHr: Double? // Algorithmically estimated maximum heart rate
@@ -318,39 +319,78 @@ class HealthManager : ObservableObject {
 	}
 
 	/// @brief Estimates the user's cycling FTP based on cycling power data in HealthKit. Uses 95% of the best recent 20 minute effort.
+	/// Take the estimate from either the best 20 minute of 8 minute power, per:
+	/// https://support.trainerroad.com/hc/en-us/articles/360003912172-How-to-Test-with-the-20-Minute-8-Minute-FTP-Tests
 	func estimateFtp() throws {
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingPower)!
-			self.powerSampleBuf.removeAll()
+
+			// Remove old data.
+			self.powerSampleBuf20Min.removeAll()
+			self.powerSampleBuf8Min.removeAll()
 
 			self.recentQuantitySamplesOfType(quantityType: powerType) { sample, error in
 				if let powerSample = sample {
 					let powerUnit: HKUnit = HKUnit.watt()
 
-					// Add to the sample buffer.
-					self.powerSampleBuf.append(powerSample)
-					if self.powerSampleBuf.count > 1 {
-						
+					// Add to the sample buffers.
+					self.powerSampleBuf20Min.append(powerSample)
+					self.powerSampleBuf8Min.append(powerSample)
+
+					// Check the 20 minute buffer.
+					if self.powerSampleBuf20Min.count > 1 {
+
 						// Remove anything that falls outside of our 20 minute window.
-						var startTime = self.powerSampleBuf[0].startDate
+						var startTime = self.powerSampleBuf20Min[0].startDate
 						let endTime = powerSample.endDate
-						while endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (20 * 60) && self.powerSampleBuf.count > 1{
-							self.powerSampleBuf.removeFirst()
-							startTime = self.powerSampleBuf[0].startDate
+						while endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (20 * 60) && self.powerSampleBuf20Min.count > 1{
+							self.powerSampleBuf20Min.removeFirst()
+							startTime = self.powerSampleBuf20Min[0].startDate
 						}
 						
 						// Make sure we didn't empty the buffer when purging old data.
 						// Also make sure we have something close to 20 mimutes of data.
-						if endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (19.5 * 60) && self.powerSampleBuf.count > 1 {
+						if endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (19.9 * 60) && self.powerSampleBuf20Min.count > 1 {
 
 							// Compute the average.
 							var sum: Double = 0.0
-							for bufSample in self.powerSampleBuf {
+							for bufSample in self.powerSampleBuf20Min {
 								sum += bufSample.quantity.doubleValue(for: powerUnit)
 							}
-							let avg = sum / Double(self.powerSampleBuf.count)
+							let avg = sum / Double(self.powerSampleBuf20Min.count)
 							let estimate = avg * 0.95
 							
+							if self.estimatedFtp == nil || estimate > self.estimatedFtp! {
+								DispatchQueue.main.async {
+									self.estimatedFtp = estimate
+								}
+							}
+						}
+					}
+
+					// Check the 8 minute buffer.
+					if self.powerSampleBuf8Min.count > 1 {
+
+						// Remove anything that falls outside of our 20 minute window.
+						var startTime = self.powerSampleBuf8Min[0].startDate
+						let endTime = powerSample.endDate
+						while endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (20 * 60) && self.powerSampleBuf8Min.count > 1{
+							self.powerSampleBuf8Min.removeFirst()
+							startTime = self.powerSampleBuf8Min[0].startDate
+						}
+
+						// Make sure we didn't empty the buffer when purging old data.
+						// Also make sure we have something close to 20 mimutes of data.
+						if endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970 > (7.9 * 60) && self.powerSampleBuf8Min.count > 1 {
+
+							// Compute the average.
+							var sum: Double = 0.0
+							for bufSample in self.powerSampleBuf8Min {
+								sum += bufSample.quantity.doubleValue(for: powerUnit)
+							}
+							let avg = sum / Double(self.powerSampleBuf8Min.count)
+							let estimate = avg * 0.9
+
 							if self.estimatedFtp == nil || estimate > self.estimatedFtp! {
 								DispatchQueue.main.async {
 									self.estimatedFtp = estimate
