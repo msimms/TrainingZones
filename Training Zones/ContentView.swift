@@ -36,6 +36,8 @@ struct ContentView: View {
 
 	@ObservedObject var zonesVM: ZonesVM = ZonesVM()
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
+	@State private var showingFtpHelp: Bool = false
+	@State private var showingPowerZonesHelp: Bool = false
 	@State private var showingHrAlgorithmSelection: Bool = false
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
@@ -234,6 +236,12 @@ struct ContentView: View {
 							Text("watts")
 								.font(.system(.body, design: .monospaced))
 						}
+						.popover(isPresented: $showingFtpHelp) {
+							Text("Either the best:\n(20 min avg power * 95%) or\n(8 min avg power * 90%)\nfrom the last six months of data.")
+								.padding()
+								.presentationCompactAdaptation(.popover)
+						}
+						.onTapGesture { showingFtpHelp.toggle() }
 					}
 					HStack() {
 						if self.zonesVM.hasPowerData() {
@@ -247,6 +255,12 @@ struct ContentView: View {
 									.bold()
 								Text(self.zonesVM.powerZonesDescription)
 							}
+							.popover(isPresented: $showingPowerZonesHelp) {
+								Text("Computed from FTP using the Andy Coggan formula.")
+									.padding()
+									.presentationCompactAdaptation(.popover)
+							}
+							.onTapGesture { showingPowerZonesHelp.toggle() }
 						}
 					}
 				}

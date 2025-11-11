@@ -40,7 +40,7 @@ class VO2MaxCalculator {
 		return 15.3 * (maxHR / restingHR)
 	}
 
-	/// @brief "Daniels and Gilbert VO2 Max formula
+	/// @brief Daniels and Gilbert VO2 Max formula
 	func EstimateVO2MaxFromRaceDistanceInMeters(raceDistanceMeters: Double, raceTimeSecs: Double) -> Double {
 		let t = raceTimeSecs / 60
 		let v = raceDistanceMeters / t
