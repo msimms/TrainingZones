@@ -124,6 +124,7 @@ class HealthManager : ObservableObject {
 		}
 	}
 
+	/// @brief Retrieves the most recent sample of the specified type.
 	func mostRecentQuantitySampleOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantitySample?, Error?) -> ()) {
 		
 		// Since we are interested in retrieving the user's latest sample, we sort the samples in descending
@@ -147,10 +148,11 @@ class HealthManager : ObservableObject {
 		self.healthStore.execute(query)
 	}
 
+	/// @brief Retrieves the samples of the specified type within the last half year.
 	func recentQuantitySamplesOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantitySample?, Error?) -> ()) {
 		
-		let oneYear = (365.25 * 24.0 * 60.0 * 60.0)
-		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - oneYear)
+		let halfYear = (365.25 * 24.0 * 60.0 * 60.0) / 2.0
+		let startDate = Date(timeIntervalSince1970: Date().timeIntervalSince1970 - halfYear)
 		let endDate = Date()
 		let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: [.strictStartDate])
 
