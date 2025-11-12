@@ -61,7 +61,7 @@ class TrainingPlaceCalculator {
 		var easyPace: Double = vo2max * 0.7
 		var marathonPace: Double = vo2max * 0.82
 		var tempoPace: Double = vo2max * 0.88
-		var functionalThresholdPace: Double = vo2max * 0.90
+		var functionalThresholdPace: Double = vo2max * 0.95
 		var speedPace: Double = vo2max * 1.1
 		var shortIntervalPace: Double = vo2max * 1.15
 	
