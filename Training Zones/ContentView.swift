@@ -38,6 +38,7 @@ struct ContentView: View {
 	@ObservedObject var healthMgr: HealthManager = HealthManager.shared
 	@State private var showingFtpHelp: Bool = false
 	@State private var showingPowerZonesHelp: Bool = false
+	@State private var showingCooperTestHelp: Bool = false
 	@State private var showingHrAlgorithmSelection: Bool = false
 	@State private var showingUnitsSelection: Bool = false
 	@State private var showingFtpError: Bool = false
@@ -327,6 +328,12 @@ struct ContentView: View {
 								.font(.system(.body, design: .monospaced))
 						}
 					}
+					.popover(isPresented: $showingCooperTestHelp) {
+						Text("Looks through HealthKit for the fastest\nrun of approximately 12 minutes.")
+							.padding()
+							.presentationCompactAdaptation(.popover)
+					}
+					.onTapGesture { showingCooperTestHelp.toggle() }
 					.padding(.bottom, 2)
 				}
 				.padding(DEFAULT_INSET)
