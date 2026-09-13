@@ -379,6 +379,10 @@ struct ContentView: View {
 							.bold()
 						Text(runPacesResult.1)
 							.multilineTextAlignment(.center)
+						HStack() {
+							Image(systemName: "questionmark.circle")
+							Text("Specific 5K or 12 minute best efforts will improve the training pace estimation.")
+						}
 					}
 				}
 				.frame(maxWidth: .infinity, maxHeight: .infinity)

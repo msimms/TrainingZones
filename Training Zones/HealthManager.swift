@@ -415,7 +415,7 @@ class HealthManager : ObservableObject {
 			if samples != nil {
 				var tempBest5KDuration: TimeInterval? // Best 5K (or greater) effort, in seconds
 				var tempBest12MinuteEffort: Double? // Best 12 minute effort, in meters
-				var best5KPace: Double = 0.0 // Pace in seconds per meter
+				var best5KPace: Double? // Pace in seconds per meter
 
 				for sample in samples! {
 					if let workout = sample as? HKWorkout {
@@ -430,9 +430,11 @@ class HealthManager : ObservableObject {
 
 								// Is this our best recent 5K?
 								if distanceMeters! >= 5000.0 {
-									if tempBest5KDuration == nil || pace <= best5KPace {
-										best5KPace = pace
+									if tempBest5KDuration == nil || durationSecs < tempBest5KDuration! {
 										tempBest5KDuration = durationSecs
+									}
+									if best5KPace == nil || pace <= best5KPace! {
+										best5KPace = pace
 									}
 								}
 
