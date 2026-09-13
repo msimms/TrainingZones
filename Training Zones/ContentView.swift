@@ -107,12 +107,10 @@ struct ContentView: View {
 				
 				// Heart Rate Zones
 				VStack(alignment: .center) {
-					HStack() {
-						Text("Heart Rate Zones")
-							.font(.system(size: 24))
-							.bold()
-							.padding(5)
-					}
+					Text("Heart Rate Zones")
+						.font(.system(size: 24))
+						.bold()
+						.padding(5)
 					HStack() {
 						if !self.zonesVM.hasHrData() {
 							Image(systemName: "exclamationmark.circle")
@@ -187,16 +185,22 @@ struct ContentView: View {
 						}
 					}
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(DEFAULT_INSET)
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
 				.padding(DEFAULT_INSET)
 
 				// Cycling Power Zones
 				VStack(alignment: .center) {
-					HStack() {
-						Text("Cycling Power Zones")
-							.font(.system(size: 24))
-							.bold()
-							.padding(5)
-					}
+					Text("Cycling Power Zones")
+						.font(.system(size: 24))
+						.bold()
+						.padding(5)
 					HStack() {
 						if !self.zonesVM.hasPowerData() {
 							Image(systemName: "exclamationmark.circle")
@@ -265,17 +269,22 @@ struct ContentView: View {
 						}
 					}
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.padding(DEFAULT_INSET)
-				
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
+				.padding(DEFAULT_INSET)
+
 				// Aerobic Performance
 				VStack(alignment: .center) {
-					HStack() {
-						Text("Aerobic Performance")
-							.font(.system(size: 24))
-							.bold()
-							.padding(5)
-					}
-					
+					Text("Aerobic Performance")
+						.font(.system(size: 24))
+						.bold()
+						.padding(5)
 					HStack() {
 						if !(self.zonesVM.hasRunData() || self.zonesVM.hasHrData()) {
 							Image(systemName: "questionmark.circle")
@@ -336,17 +345,22 @@ struct ContentView: View {
 					.onTapGesture { showingCooperTestHelp.toggle() }
 					.padding(.bottom, 2)
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(DEFAULT_INSET)
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
 				.padding(DEFAULT_INSET)
 
 				// Run Training Paces
 				VStack(alignment: .center) {
-					HStack() {
-						Text("Run Training Paces")
-							.font(.system(size: 24))
-							.bold()
-							.padding(5)
-					}
-
+					Text("Run Training Paces")
+						.font(.system(size: 24))
+						.bold()
+						.padding(5)
 					VStack() {
 						let runPacesResult = self.zonesVM.listRunTrainingPaces()
 						ForEach([LONG_RUN_PACE_STR, EASY_RUN_PACE_STR, TEMPO_RUN_PACE_STR, FUNCTIONAL_THRESHOLD_PACE_STR], id:\.self) { paceName in
@@ -367,6 +381,14 @@ struct ContentView: View {
 							.multilineTextAlignment(.center)
 					}
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(DEFAULT_INSET)
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
 				.padding(DEFAULT_INSET)
 
 				// Unit selection
@@ -389,6 +411,14 @@ struct ContentView: View {
 						}
 					}
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(DEFAULT_INSET)
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
 				.padding(DEFAULT_INSET)
 
 				// Notes
@@ -396,6 +426,14 @@ struct ContentView: View {
 					Image(systemName: "questionmark.circle")
 					Text("All the values used in these calculations are either read or estimated from HealthKit data.")
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.padding(DEFAULT_INSET)
+				.background(.ultraThinMaterial)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(.ultraThinMaterial, lineWidth: 3)
+				)
 				.padding(DEFAULT_INSET)
 			}
 		}
