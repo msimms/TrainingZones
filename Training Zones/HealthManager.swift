@@ -405,6 +405,7 @@ class HealthManager : ObservableObject {
 		}
 	}
 	
+	/// @brief Accessor method for retrieving the FTP value from HealthKit.
 	func getFtp() throws {
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			let powerType = HKObjectType.quantityType(forIdentifier: .cyclingFunctionalThresholdPower)!
@@ -421,6 +422,7 @@ class HealthManager : ObservableObject {
 		}
 	}
 	
+	/// @brief Accessor method for writing the FTP value to HealthKit.
 	func setFtp() {
 		if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
 			if let tempFtp = self.ftp {
