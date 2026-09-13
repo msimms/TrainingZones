@@ -199,38 +199,6 @@ class HealthManager : ObservableObject {
 		self.healthStore.execute(query)
 	}
 
-	func subscribeToQuantitySamplesOfType(quantityType: HKQuantityType, callback: @escaping (HKQuantity?, Date?, Error?) -> ()) -> HKQuery {
-
-		let datePredicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options:HKQueryOptions.strictStartDate)
-		let query = HKAnchoredObjectQuery.init(type: quantityType, predicate: datePredicate, anchor: nil, limit: HKObjectQueryNoLimit, resultsHandler: { query, addedObjects, deletedObjects, newAnchor, error in
-
-			if addedObjects != nil {
-				for sample in addedObjects! {
-					if let quantitySample = sample as? HKQuantitySample {
-						callback(quantitySample.quantity, quantitySample.endDate, error)
-					}
-				}
-			}
-		})
-
-		query.updateHandler = { query, addedObjects, deletedObjects, newAnchor, error in
-			for sample in addedObjects! {
-				if let quantitySample = sample as? HKQuantitySample {
-					callback(quantitySample.quantity, quantitySample.endDate, error)
-				}
-			}
-		}
-
-		// Execute asynchronously.
-		self.healthStore.execute(query)
-
-		// Background delivery.
-		self.healthStore.enableBackgroundDelivery(for: quantityType, frequency: .immediate, withCompletion: {(succeeded: Bool, error: Error!) in
-		})
-
-		return query
-	}
-
 	/// @brief Gets the user's age from HealthKit .
 	func getAge() throws {
 		let dateOfBirth = try self.healthStore.dateOfBirthComponents()
